@@ -1,6 +1,10 @@
 name: "Publish OpenAPI to Swaggerhub"
 
 on:
+  # workaround to make missing workflow appear in GitHub actions
+  push:
+    branches:
+      - github-actions-workaround
   workflow_call:
     inputs:
       version:
