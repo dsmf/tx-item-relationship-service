@@ -9,7 +9,7 @@ The deployment contains the components required to connect the IRS to an existin
 
 Everything else needs to be provided externally.
 
-![adminguide_000](https://eclipse-tractusx.github.io/item-relationship-service/docs/assets/adminguide/adminguide_000.png)
+![adminguide_000](https://dsmf.github.io/tx-item-relationship-service/docs/assets/adminguide/adminguide_000.png)
 
 ## Installation
 

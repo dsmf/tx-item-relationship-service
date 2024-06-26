@@ -18,7 +18,7 @@ The IRS is a:
 
 ### Substantial Features
 
-* provide a top-down BoM asBuilt tree structure along the submodel "SingleLevelBomAsBuilt"
+* provide a top-down BoM asBuilt tree structure along the submodel ["SingleLevelBomAsBuilt"](https://github.com/eclipse-tractusx/sldt-semantic-models/tree/main/io.catenax.single_level_bom_as_built)
 * usage of EDC consumer for communicating with the Catena-X network
 * functionality of IRS provider will be handled by providers submodel servers
 * federated IRS service
@@ -99,7 +99,7 @@ The IRS acts as a middleware between consumers and manufacturers. This section d
 
 ## Business context
 
-![arc42_000](https://eclipse-tractusx.github.io/item-relationship-service/docs/assets/arc42/arc42_000.png)
+![arc42_000](https://dsmf.github.io/tx-item-relationship-service/docs/assets/arc42/arc42_000.png)
 
 ### Consumer
 
@@ -113,7 +113,7 @@ As of now, the IRS uses its own IAM credentials to gather the required data. Thi
 
 ## Technical context
 
-![arc42_001](https://eclipse-tractusx.github.io/item-relationship-service/docs/assets/arc42/arc42_001.png)
+![arc42_001](https://dsmf.github.io/tx-item-relationship-service/docs/assets/arc42/arc42_001.png)
 
 ### Component overview
 
@@ -125,7 +125,7 @@ In order to consume the Restful application IRS, the security aspect should be t
 
 #### Registry API
 
-The IRS acts as a consumer of the component Asset Administration Shell Registry. The IRS contains a Restful client (REST template) that build a REST call to the mentioned Digital Twin Registry API based on its known URL (the AAS registry URL is configured in the IRS Restful API). The request contains the given "globalAssetId" by the consumer. Like described in the above section, the security aspect is required in order to achieve a REST call against the AAS Registry. As a response, the IRS gets the corresponding asset administration shell descriptor. The last one contains a list of submodel descriptors which can be filtered by the aspect type entered by the consumer. An aspect type like SingleLevelBomAsBuilt, SerialPart etc. And as mentioned above, the transport protocol HTTP(S) is used for the REST call communication.
+The IRS acts as a consumer of the component Asset Administration Shell Registry. The IRS contains a Restful client (REST template) that build a REST call to the mentioned Digital Twin Registry API based on its known URL (the AAS registry URL is configured in the IRS Restful API). The request contains the given "globalAssetId" by the consumer. Like described in the above section, the security aspect is required in order to achieve a REST call against the AAS Registry. As a response, the IRS gets the corresponding asset administration shell descriptor. The last one contains a list of submodel descriptors which can be filtered by the aspect type entered by the consumer. An aspect type like [SingleLevelBomAsBuilt](https://github.com/eclipse-tractusx/sldt-semantic-models/tree/main/io.catenax.single_level_bom_as_built), [SerialPart](https://github.com/eclipse-tractusx/sldt-semantic-models/tree/main/io.catenax.serial_part) etc. And as mentioned above, the transport protocol HTTP(S) is used for the REST call communication.
 
 ##### Discovery Service
 
@@ -237,7 +237,7 @@ The interfaces show how the components interact with each other and which interf
 
 ### Component diagram
 
-![arc42_002](https://eclipse-tractusx.github.io/item-relationship-service/docs/assets/arc42/arc42_002.png)
+![arc42_002](https://dsmf.github.io/tx-item-relationship-service/docs/assets/arc42/arc42_002.png)
 
 ### Component description
 
@@ -279,7 +279,7 @@ The interfaces show how the components interact with each other and which interf
 
 ### Component diagram
 
-![arc42_003](https://eclipse-tractusx.github.io/item-relationship-service/docs/assets/arc42/arc42_003.png)
+![arc42_003](https://dsmf.github.io/tx-item-relationship-service/docs/assets/arc42/arc42_003.png)
 
 ### Component description
 
@@ -308,7 +308,7 @@ The IRS REST controller is used to provide a RESTful web service.
 
 #### Component diagram
 
-![arc42_004](https://eclipse-tractusx.github.io/item-relationship-service/docs/assets/arc42/arc42_004.png)
+![arc42_004](https://dsmf.github.io/tx-item-relationship-service/docs/assets/arc42/arc42_004.png)
 
 #### Component description
 
@@ -327,7 +327,7 @@ The **RecursiveJobHandler** component provide the logic to build jobs recursivel
 
 #### Component diagram
 
-![arc42_005](https://eclipse-tractusx.github.io/item-relationship-service/docs/assets/arc42/arc42_005.png)
+![arc42_005](https://dsmf.github.io/tx-item-relationship-service/docs/assets/arc42/arc42_005.png)
 
 #### Component description
 
@@ -344,7 +344,7 @@ The TransferProcessManager creates executions and provides them to the executor 
 
 #### Component diagram
 
-![arc42_006](https://eclipse-tractusx.github.io/item-relationship-service/docs/assets/arc42/arc42_006.png)
+![arc42_006](https://dsmf.github.io/tx-item-relationship-service/docs/assets/arc42/arc42_006.png)
 
 #### Component description
 
@@ -379,7 +379,7 @@ The ESS REST controller is used to provide a RESTful web service to related Envi
 
 #### Component diagram
 
-![arc42_007](https://eclipse-tractusx.github.io/item-relationship-service/docs/assets/arc42/arc42_007.png)
+![arc42_007](https://dsmf.github.io/tx-item-relationship-service/docs/assets/arc42/arc42_007.png)
 
 #### Component description
 
@@ -400,11 +400,11 @@ Since we cannot rely on synchronous responses regarding the requests of submodel
 
 ### IRS interaction diagram
 
-![arc42_008](https://eclipse-tractusx.github.io/item-relationship-service/docs/assets/arc42/arc42_008.png)
+![arc42_008](https://dsmf.github.io/tx-item-relationship-service/docs/assets/arc42/arc42_008.png)
 
 ### ESS Investigation interaction diagram
 
-![arc42_009](https://eclipse-tractusx.github.io/item-relationship-service/docs/assets/arc42/arc42_009.png)
+![arc42_009](https://dsmf.github.io/tx-item-relationship-service/docs/assets/arc42/arc42_009.png)
 
 ## Runtime view
 
@@ -412,37 +412,37 @@ Since we cannot rely on synchronous responses regarding the requests of submodel
 
 This section describes the iterative flow, the main processes of the IRS, and explains how data is transferred and processed when a job is executed.
 
-![arc42_010](https://eclipse-tractusx.github.io/item-relationship-service/docs/assets/arc42/arc42_010.png)
+![arc42_010](https://dsmf.github.io/tx-item-relationship-service/docs/assets/arc42/arc42_010.png)
 
 ### Submodel
 
 This section describes how the IRS fetches submodel payload.
 
-![arc42_011](https://eclipse-tractusx.github.io/item-relationship-service/docs/assets/arc42/arc42_011.png)
+![arc42_011](https://dsmf.github.io/tx-item-relationship-service/docs/assets/arc42/arc42_011.png)
 
 ### Job orchestration flow
 
 This section describes the job orchestration in IRS.
 
-![arc42_012](https://eclipse-tractusx.github.io/item-relationship-service/docs/assets/arc42/arc42_012.png)
+![arc42_012](https://dsmf.github.io/tx-item-relationship-service/docs/assets/arc42/arc42_012.png)
 
 ### Policy store flow
 
 This section describes the policy store in IRS.
 
-![arc42_013](https://eclipse-tractusx.github.io/item-relationship-service/docs/assets/arc42/arc42_013.png)
+![arc42_013](https://dsmf.github.io/tx-item-relationship-service/docs/assets/arc42/arc42_013.png)
 
 ### Policy check procedure
 
 This section describes the way IRS is validating policies found in assets.
 
-![arc42_014](https://eclipse-tractusx.github.io/item-relationship-service/docs/assets/arc42/arc42_014.png)
+![arc42_014](https://dsmf.github.io/tx-item-relationship-service/docs/assets/arc42/arc42_014.png)
 
 ## Scenario 1: Create job
 
 This section describes what happens when user creates a new job.
 
-![arc42_015](https://eclipse-tractusx.github.io/item-relationship-service/docs/assets/arc42/arc42_015.png)
+![arc42_015](https://dsmf.github.io/tx-item-relationship-service/docs/assets/arc42/arc42_015.png)
 
 ### Overview
 
@@ -457,13 +457,13 @@ The input provided by the caller determines how the job will operate (starting p
 
 This section describes how a job is asynchronously executed inside the IRS.
 
-![arc42_016](https://eclipse-tractusx.github.io/item-relationship-service/docs/assets/arc42/arc42_016.png)
+![arc42_016](https://dsmf.github.io/tx-item-relationship-service/docs/assets/arc42/arc42_016.png)
 
 ### Overview
 
 After a job has been created (see Scenario 1: Create Job), the first transfer containing the root item ID is passed to the ExecutorService. The transfer is then started asynchronously and retrieves the necessary information from the Catena-X network, first by fetching the AAS information from the DigitalTwin registry and then calling the SubmodelProviders for the submodel payload.
 
-At least the aspect SingleLevelBomAsBuilt is required for the tree to be built. If the customer that started the job provided more aspects to be fetched, they will be retrieved here too.
+At least the aspect [SingleLevelBomAsBuilt](https://github.com/eclipse-tractusx/sldt-semantic-models/tree/main/io.catenax.single_level_bom_as_built) is required for the tree to be built. If the customer that started the job provided more aspects to be fetched, they will be retrieved here too.
 The result of each transfer is stored in the BlobStore.
 
 After the transfer process has finished, any subsequent child IDs will be extracted and new transfer processes will be scheduled for those via the ExecutorService. This cycle repeats until all leafs were reached, the specified max depth has been reached, or the job was canceled externally.
@@ -472,7 +472,7 @@ As soon as all transfers are finished, the results will be combined and stored i
 
 ## Scenario 3: Request for JobResponse
 
-![arc42_017](https://eclipse-tractusx.github.io/item-relationship-service/docs/assets/arc42/arc42_017.png)
+![arc42_017](https://dsmf.github.io/tx-item-relationship-service/docs/assets/arc42/arc42_017.png)
 
 ### Overview
 
@@ -483,7 +483,7 @@ This will then be passed to the caller.
 
 ## Scenario 4: Cancel job execution
 
-![arc42_018](https://eclipse-tractusx.github.io/item-relationship-service/docs/assets/arc42/arc42_018.png)
+![arc42_018](https://dsmf.github.io/tx-item-relationship-service/docs/assets/arc42/arc42_018.png)
 
 ### Overview
 
@@ -512,7 +512,7 @@ The BoM as planned aspect models consists of three aspect models:
 
 ### Overall flow
 
-![arc42_019](https://eclipse-tractusx.github.io/item-relationship-service/docs/assets/arc42/arc42_019.png)
+![arc42_019](https://dsmf.github.io/tx-item-relationship-service/docs/assets/arc42/arc42_019.png)
 
 | Step | Actor | Action | Details |
 | --- | --- | --- | --- |
@@ -536,7 +536,7 @@ Note: ESS supplier responses are involved in each step of the process.
 
 ### Flow on company level
 
-![arc42_020](https://eclipse-tractusx.github.io/item-relationship-service/docs/assets/arc42/arc42_020.png)
+![arc42_020](https://dsmf.github.io/tx-item-relationship-service/docs/assets/arc42/arc42_020.png)
 
 #### Step 0: Process initiation
 
@@ -593,13 +593,13 @@ In case at least one "YES" is received, the process step 3 ends
 | NO | UNKNOW | NO | UNKNOW | Unknown if no Yes and at leat one bpn is unknown state. |
 | NO | NO | NO | NO | No if complete SupplyChain is not impacted |
 
-![arc42_021](https://eclipse-tractusx.github.io/item-relationship-service/docs/assets/arc42/arc42_021.png)
+![arc42_021](https://dsmf.github.io/tx-item-relationship-service/docs/assets/arc42/arc42_021.png)
 
 ### Application Functionality Overview
 
 #### Register an Ess-Investigation-Order
 
-![arc42_022](https://eclipse-tractusx.github.io/item-relationship-service/docs/assets/arc42/arc42_022.png)
+![arc42_022](https://dsmf.github.io/tx-item-relationship-service/docs/assets/arc42/arc42_022.png)
 
 ##### 1. Client Request
 
@@ -643,7 +643,7 @@ This section describes what happens when user creates an ess order.
 
 ### Register an Ess-Investigation-Order
 
-![arc42_023](https://eclipse-tractusx.github.io/item-relationship-service/docs/assets/arc42/arc42_023.png)
+![arc42_023](https://dsmf.github.io/tx-item-relationship-service/docs/assets/arc42/arc42_023.png)
 
 | Step | Actor | Action | Details |
 | --- | --- | --- | --- |
@@ -664,7 +664,7 @@ This section describes what happens when user creates an ess job.
 
 ### Register an Ess-Investigation Job
 
-![arc42_024](https://eclipse-tractusx.github.io/item-relationship-service/docs/assets/arc42/arc42_024.png)
+![arc42_024](https://dsmf.github.io/tx-item-relationship-service/docs/assets/arc42/arc42_024.png)
 
 | Step | Actor | Action | Details |
 | --- | --- | --- | --- |
@@ -691,7 +691,7 @@ This section describes what happens when user creates an ess job.
 
 The deployment view shows the IRS application on ArgoCD, which is a continuous delivery tool for Kubernetes. Kubernetes manifests are specified using Helm charts. Helm is a package manager for Kubernetes. IRS is developed in a cloud-agnostic manner, so the application could be installed in any cloud infrastructure (on-premises, hybrid, or public cloud infrastructure).
 
-![arc42_025](https://eclipse-tractusx.github.io/item-relationship-service/docs/assets/arc42/arc42_025.png)
+![arc42_025](https://dsmf.github.io/tx-item-relationship-service/docs/assets/arc42/arc42_025.png)
 
 ### Operator
 
@@ -733,25 +733,25 @@ For information on how to run the application locally, please check the README d
 
 The isolated environment contains the IRS as well as all surrounding services.
 
-![arc42_026](https://eclipse-tractusx.github.io/item-relationship-service/docs/assets/arc42/arc42_026.png)
+![arc42_026](https://dsmf.github.io/tx-item-relationship-service/docs/assets/arc42/arc42_026.png)
 
 ### Development environment
 
 The development environment contains the IRS as well as the essential surrounding services, excluding the external IAM.
 
-![arc42_027](https://eclipse-tractusx.github.io/item-relationship-service/docs/assets/arc42/arc42_027.png)
+![arc42_027](https://dsmf.github.io/tx-item-relationship-service/docs/assets/arc42/arc42_027.png)
 
 ### Integrated environment
 
 The integrated environment contains the IRS and is integrated with the rest of the Catena-X network.
 
-![arc42_028](https://eclipse-tractusx.github.io/item-relationship-service/docs/assets/arc42/arc42_028.png)
+![arc42_028](https://dsmf.github.io/tx-item-relationship-service/docs/assets/arc42/arc42_028.png)
 
 ## Level 1 - IRS application
 
 This section focuses only on the IRS itself, detached from its neighbors. It shows the resources deployed in Kubernetes for the IRS.
 
-![arc42_029](https://eclipse-tractusx.github.io/item-relationship-service/docs/assets/arc42/arc42_029.png)
+![arc42_029](https://dsmf.github.io/tx-item-relationship-service/docs/assets/arc42/arc42_029.png)
 
 ### Pod
 
@@ -775,11 +775,11 @@ The ingress uses a reverse proxy to provide specified Service ports to the inter
 
 ### Domain entity model
 
-![arc42_030](https://eclipse-tractusx.github.io/item-relationship-service/docs/assets/arc42/arc42_030.png)
+![arc42_030](https://dsmf.github.io/tx-item-relationship-service/docs/assets/arc42/arc42_030.png)
 
 ### Domain model
 
-![arc42_031](https://eclipse-tractusx.github.io/item-relationship-service/docs/assets/arc42/arc42_031.png)
+![arc42_031](https://dsmf.github.io/tx-item-relationship-service/docs/assets/arc42/arc42_031.png)
 
 ### API Model
 
@@ -798,15 +798,15 @@ A job can be in one of the following states:
 | COMPLETED | The job has completed. See the job response for details on the data. |
 | ERROR | The job could not be processed correctly by the IRS due to a technical problem. |
 
-![arc42_032](https://eclipse-tractusx.github.io/item-relationship-service/docs/assets/arc42/arc42_032.png)
+![arc42_032](https://dsmf.github.io/tx-item-relationship-service/docs/assets/arc42/arc42_032.png)
 
 ### Job Store Datamodel
 
-![arc42_033](https://eclipse-tractusx.github.io/item-relationship-service/docs/assets/arc42/arc42_033.png)
+![arc42_033](https://dsmf.github.io/tx-item-relationship-service/docs/assets/arc42/arc42_033.png)
 
 ### Job Response Datamodel
 
-![arc42_034](https://eclipse-tractusx.github.io/item-relationship-service/docs/assets/arc42/arc42_034.png)
+![arc42_034](https://dsmf.github.io/tx-item-relationship-service/docs/assets/arc42/arc42_034.png)
 
 ```json
 {
@@ -1013,7 +1013,7 @@ The hexagonal architecture divides a system into several loosely-coupled interch
 
 For the IRS, this means decoupling the application logic from components like the BLOB store, the REST API controllers or the AAS client connection. With an interface between the parts (so-called port), it is easy to switch to other implementations, e.g. if you want to change the persistence implementation. No changes to the application logic will be necessary.
 
-![arc42_035](https://eclipse-tractusx.github.io/item-relationship-service/docs/assets/arc42/arc42_035.png)
+![arc42_035](https://dsmf.github.io/tx-item-relationship-service/docs/assets/arc42/arc42_035.png)
 
 ## "Under-the-hood" concepts
 
@@ -1388,7 +1388,7 @@ The quality scenarios in this section depict the fundamental quality goals as we
 | Parts Relationship Service | PRS | Formerly known Service Name: Parts Relationship Service |
 | Self-Sovereign Identity | SSI | For more information see: [ssi-docu](https://github.com/eclipse-tractusx/ssi-docu/tree/main/docs/architecture/cx-3-2) |
 | Shell |  | see "Asset Administration Shell" |
-| Traversal Aspect |  | aka Edge: Aspect which the IRS uses for traversal through the data chain. Identified by a parent-child or a child-parent relationship. Samples: SingleLevelBomAsPlanned, SingleLevelBomAsBuilt and SingleLevelUsageAsBuilt |
+| Traversal Aspect |  | aka Edge: Aspect which the IRS uses for traversal through the data chain. Identified by a parent-child or a child-parent relationship. Samples: [SingleLevelBomAsPlanned](https://github.com/eclipse-tractusx/sldt-semantic-models/tree/main/io.catenax.single_level_bom_as_planned), [SingleLevelBomAsBuilt](https://github.com/eclipse-tractusx/sldt-semantic-models/tree/main/io.catenax.single_level_bom_as_built) and [SingleLevelUsageAsBuilt](https://github.com/eclipse-tractusx/sldt-semantic-models/tree/main/io.catenax.single_level_usage_as_built) |
 | Verifiable Credential | VC | For more information see: [Verifiable Credentials](https://github.com/eclipse-tractusx/ssi-docu/tree/main/docs/architecture/cx-3-2/3.%20Verifiable%20Credentials) |
 
 ### NOTICE
