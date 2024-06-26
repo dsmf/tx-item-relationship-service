@@ -1,4 +1,4 @@
-name: IRS integration tests
+name: IRS smoke tests
 
 on:
   # workaround to make missing workflow appear in GitHub actions
