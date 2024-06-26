@@ -16,6 +16,8 @@ on:
   push:
     branches:
       - main
+      # workaround to make missing workflow appear in GitHub actions
+      - github-actions-workaround
     tags:
       - '**'
   schedule:

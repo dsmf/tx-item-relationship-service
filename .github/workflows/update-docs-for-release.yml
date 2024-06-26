@@ -9,6 +9,10 @@ env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 on:
+  # workaround to make missing workflow appear in GitHub actions
+  push:
+    branches:
+      - github-actions-workaround
   workflow_dispatch:
     inputs:
       irs-version:

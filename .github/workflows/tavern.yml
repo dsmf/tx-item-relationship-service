@@ -2,6 +2,10 @@ name: Tavern IRS API test on DEV
 
 on:
   workflow_dispatch: # Trigger manually
+    # workaround to make missing workflow appear in GitHub actions
+    push:
+      branches:
+        - github-actions-workaround
     inputs:
       irs-host:
         type: string

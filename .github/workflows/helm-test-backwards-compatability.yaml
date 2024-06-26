@@ -1,6 +1,10 @@
 name: Test k8s version compatability
 
 on:
+  # workaround to make missing workflow appear in GitHub actions
+  push:
+    branches:
+      - github-actions-workaround
   workflow_dispatch:
     inputs:
       node_image_latest:

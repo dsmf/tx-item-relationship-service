@@ -1,6 +1,10 @@
 name: Upgrade Charts
 
 on:
+  # workaround to make missing workflow appear in GitHub actions
+  push:
+    branches:
+      - github-actions-workaround
   pull_request:
     paths:
       - 'charts/item-relationship-service/**'
