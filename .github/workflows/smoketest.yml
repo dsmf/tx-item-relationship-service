@@ -1,9 +1,9 @@
 name: IRS smoke tests
 
 on:
-  # workaround to make missing workflow appear in GitHub actions
   push:
     branches:
+      # workaround to make missing workflow appear in GitHub actions
       - github-actions-workaround
   workflow_dispatch:
     inputs:
