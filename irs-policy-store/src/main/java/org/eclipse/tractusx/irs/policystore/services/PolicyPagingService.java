@@ -22,6 +22,9 @@ package org.eclipse.tractusx.irs.policystore.services;
 import static org.eclipse.tractusx.irs.policystore.models.SearchCriteria.JoinOperator.AND;
 import static org.eclipse.tractusx.irs.policystore.models.SearchCriteria.JoinOperator.OR;
 
+import static org.eclipse.tractusx.irs.policystore.models.SearchCriteria.Operation.EQUALS;
+import static org.eclipse.tractusx.irs.policystore.models.SearchCriteria.Operation.STARTS_WITH;
+
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +37,6 @@ import org.eclipse.tractusx.irs.edc.client.policy.Policy;
 import org.eclipse.tractusx.irs.policystore.common.CommonConstants;
 import org.eclipse.tractusx.irs.policystore.models.PolicyWithBpn;
 import org.eclipse.tractusx.irs.policystore.models.SearchCriteria;
-import org.eclipse.tractusx.irs.policystore.models.SearchCriteria.Operation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -90,7 +92,7 @@ public class PolicyPagingService {
      * Builder for {@link Comparator} for sorting a list of {@link PolicyWithBpn} objects.
      */
     private static class PolicyComparatorBuilder {
-        // TODO (mfischer): #639: maybe extract to separate class
+        // TODO (mfischer): #750: maybe extract to separate class
 
         private final Pageable pageable;
 
@@ -132,7 +134,12 @@ public class PolicyPagingService {
             } else if (CommonConstants.PROPERTY_ACTION.equalsIgnoreCase(property)) {
                 fieldComparator = Comparator.comparing(p -> {
                     final List<Permission> permissions = p.policy().getPermissions();
-                    return permissions.isEmpty() ? null : permissions.get(0).getAction();
+                    if (permissions == null || permissions.isEmpty()) {
+                        return null;
+                    } else {
+                        // we use the action of the first permission in the list for sorting
+                        return permissions.get(0).getAction();
+                    }
                 });
             } else {
                 log.warn("Sorting by field '{}' is not supported", order.getProperty());
@@ -168,7 +175,7 @@ public class PolicyPagingService {
      * Builder for {@link Predicate} for filtering a list of {@link PolicyWithBpn} objects.
      */
     private static class PolicyFilterBuilder {
-        // TODO (mfischer): #639: maybe extract to separate class
+        // TODO (mfischer): #750: maybe extract to separate class
 
         private final List<SearchCriteria<?>> searchCriteriaList;
 
@@ -205,16 +212,15 @@ public class PolicyPagingService {
                 return getBpnFilter(searchCriteria);
             } else if (CommonConstants.PROPERTY_POLICY_ID.equalsIgnoreCase(searchCriteria.getProperty())) {
                 return getPolicyIdFilter(searchCriteria);
-
-                // TODO (mfischer): #639: add coverage for action, createdOn, validUntil
+                // TODO (mfischer): #750: add test coverage for createdOn, validUntil
             } else if (CommonConstants.PROPERTY_ACTION.equalsIgnoreCase(searchCriteria.getProperty())) {
                 return getActionFilter(searchCriteria);
             } else if (CommonConstants.PROPERTY_CREATED_ON.equalsIgnoreCase(searchCriteria.getProperty())) {
-                // TODO (mfischer): #639: implement createdOn filter
+                // TODO (mfischer): #750: implement createdOn filter
                 throw new IllegalArgumentException("Filtering by '%s' has not been implemented yet".formatted(
                         CommonConstants.PROPERTY_CREATED_ON));
             } else if (CommonConstants.PROPERTY_VALID_UNTIL.equalsIgnoreCase(searchCriteria.getProperty())) {
-                // TODO (mfischer): #639: implement validUntil filter
+                // TODO (mfischer): #750: implement validUntil filter
                 throw new IllegalArgumentException("Filtering by '%s' has not been implemented yet".formatted(
                         CommonConstants.PROPERTY_VALID_UNTIL));
             } else {
@@ -229,7 +235,7 @@ public class PolicyPagingService {
                         (String) searchCriteria.getValue());
                 default -> throw new IllegalArgumentException(
                         "The property 'policyId' only supports the following operations: %s".formatted(
-                                List.of(Operation.EQUALS, Operation.STARTS_WITH)));
+                                List.of(EQUALS, STARTS_WITH)));
             };
         }
 
@@ -239,30 +245,27 @@ public class PolicyPagingService {
                 case STARTS_WITH -> p -> StringUtils.startsWithIgnoreCase(p.bpn(), (String) searchCriteria.getValue());
                 default -> throw new IllegalArgumentException(
                         "The property 'BPN' only supports the following operations: %s".formatted(
-                                List.of(Operation.EQUALS, Operation.STARTS_WITH)));
+                                List.of(EQUALS, STARTS_WITH)));
             };
         }
 
         private Predicate<PolicyWithBpn> getActionFilter(final SearchCriteria<?> searchCriteria) {
-            if (Operation.EQUALS.equals(searchCriteria.getOperation())) {
+            if (EQUALS.equals(searchCriteria.getOperation())) {
                 return p -> {
                     final List<Permission> permissions = p.policy().getPermissions();
                     if (permissions == null || permissions.isEmpty()) {
                         return false;
+                    } else {
+                        // we use the action of the first permission in the list for filtering
+                        return permissions.get(0)
+                                          .getAction()
+                                          .getValue()
+                                          .equalsIgnoreCase((String) searchCriteria.getValue());
                     }
-                    // TODO (mfischer) #639: clarify which to use, add test
-                    // option 1: filter on first action
-                    //return permissions.get(0).getAction().getValue().equalsIgnoreCase((String) searchCriteria.getValue());
-                    // option 2: filter on all actions
-                    return permissions.stream()
-                                      .map(Permission::getAction)
-                                      .anyMatch(action -> action.getValue()
-                                                                .equalsIgnoreCase((String) searchCriteria.getValue()));
                 };
             } else {
                 throw new IllegalArgumentException(
-                        "The property 'action' only supports the following operations: %s".formatted(
-                                List.of(Operation.EQUALS)));
+                        "The property 'action' only supports the following operations: %s".formatted(List.of(EQUALS)));
             }
         }
     }

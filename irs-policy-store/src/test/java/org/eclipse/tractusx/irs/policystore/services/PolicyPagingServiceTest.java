@@ -28,6 +28,12 @@ import static org.eclipse.tractusx.irs.policystore.models.SearchCriteria.JoinOpe
 import static org.eclipse.tractusx.irs.policystore.models.SearchCriteria.Operation.BETWEEN;
 import static org.eclipse.tractusx.irs.policystore.models.SearchCriteria.Operation.EQUALS;
 import static org.eclipse.tractusx.irs.policystore.models.SearchCriteria.Operation.STARTS_WITH;
+import static org.eclipse.tractusx.irs.policystore.common.CommonConstants.PROPERTY_ACTION;
+import static org.eclipse.tractusx.irs.policystore.common.CommonConstants.PROPERTY_BPN;
+import static org.eclipse.tractusx.irs.policystore.common.CommonConstants.PROPERTY_POLICY_ID;
+import static org.eclipse.tractusx.irs.policystore.models.SearchCriteria.Operation.BETWEEN;
+import static org.eclipse.tractusx.irs.policystore.models.SearchCriteria.Operation.EQUALS;
+import static org.eclipse.tractusx.irs.policystore.models.SearchCriteria.Operation.STARTS_WITH;
 
 import java.time.OffsetDateTime;
 import java.util.Arrays;
@@ -67,12 +73,12 @@ class PolicyPagingServiceTest {
 
     private final Map<String, List<Policy>> policiesMap = Map.of( //
             "BPN2", Arrays.asList( //
-                    createPolicy("policy-3"), //
-                    createPolicy("policy-2"), //
-                    createPolicy("policy-5") //
+                    createPolicy("policy-3", PolicyType.USE), //
+                    createPolicy("policy-2", PolicyType.USE), //
+                    createPolicy("policy-5", PolicyType.USE) //
             ), "BPN1", Arrays.asList( //
-                    createPolicy("policy-4"), //
-                    createPolicy("policy-1") //
+                    createPolicy("policy-4", PolicyType.USE), //
+                    createPolicy("policy-1", PolicyType.USE) //
             ) //
     );
 
@@ -96,7 +102,7 @@ class PolicyPagingServiceTest {
         public void whenSortedByBpnAsc() {
 
             final Page<PolicyWithBpn> result = testee.getPolicies(policiesMap,
-                    PageRequest.of(0, 10, Sort.by("bpn").ascending()), NO_SEARCH_CRITERIA);
+                    PageRequest.of(0, 10, Sort.by(PROPERTY_BPN).ascending()), NO_SEARCH_CRITERIA);
 
             assertThat(result.getContent().stream().map(p -> p.policy().getPolicyId()).toList()).containsExactly(
                     // BPN1
@@ -109,7 +115,7 @@ class PolicyPagingServiceTest {
         public void whenSortedByBpnDesc() {
 
             final Page<PolicyWithBpn> result = testee.getPolicies(policiesMap,
-                    PageRequest.of(0, 10, Sort.by("bpn").descending()), NO_SEARCH_CRITERIA);
+                    PageRequest.of(0, 10, Sort.by(PROPERTY_BPN).descending()), NO_SEARCH_CRITERIA);
 
             assertThat(result.getContent().stream().map(PolicyWithBpn::bpn).toList()).containsExactly("BPN2", "BPN2",
                     "BPN2", "BPN1", "BPN1");
@@ -118,8 +124,8 @@ class PolicyPagingServiceTest {
         @Test
         public void whenSortedByBpnAscAndPolicyIdDesc() {
 
-            final Page<PolicyWithBpn> result = testee.getPolicies(policiesMap,
-                    PageRequest.of(0, 10, Sort.by("bpn").ascending().and(Sort.by("policyId").descending())),
+            final Page<PolicyWithBpn> result = testee.getPolicies(policiesMap, PageRequest.of(0, 10,
+                            Sort.by(PROPERTY_BPN).ascending().and(Sort.by(PROPERTY_POLICY_ID).descending())),
                     NO_SEARCH_CRITERIA);
 
             assertThat(result.getContent().stream().map(p -> p.policy().getPolicyId()).toList()).containsExactly(
@@ -132,8 +138,8 @@ class PolicyPagingServiceTest {
         @Test
         public void whenSortedByBpnDescAndPolicyIdAsc() {
 
-            final Page<PolicyWithBpn> result = testee.getPolicies(policiesMap,
-                    PageRequest.of(0, 10, Sort.by("bpn").descending().and(Sort.by("policyId").ascending())),
+            final Page<PolicyWithBpn> result = testee.getPolicies(policiesMap, PageRequest.of(0, 10,
+                            Sort.by(PROPERTY_BPN).descending().and(Sort.by(PROPERTY_POLICY_ID).ascending())),
                     NO_SEARCH_CRITERIA);
 
             assertThat(result.getContent().stream().map(p -> p.policy().getPolicyId()).toList()).containsExactly(
@@ -203,7 +209,7 @@ class PolicyPagingServiceTest {
         public void policyId_invalidOperation() {
 
             final List<SearchCriteria<?>> searchCriteria = List.of(
-                    new SearchCriteria<>(AND, "policyId", BETWEEN, "policy-2"));
+                    new SearchCriteria<>(AND, PROPERTY_POLICY_ID, BETWEEN, "policy-2"));
             final ThrowingCallable call = () -> testee.getPolicies(policiesMap, PageRequest.of(0, 10), searchCriteria);
 
             assertThatThrownBy(call).isInstanceOf(IllegalArgumentException.class)
@@ -215,7 +221,7 @@ class PolicyPagingServiceTest {
         public void filterByPolicyIdEquals_shouldFindExactlyOne() {
 
             final Page<PolicyWithBpn> result = testee.getPolicies(policiesMap, PageRequest.of(0, 10),
-                    List.of(new SearchCriteria<>(AND, "policyId", EQUALS, "policy-2")));
+                    List.of(new SearchCriteria<>(AND, PROPERTY_POLICY_ID, EQUALS, "policy-2")));
 
             assertThat(result).isNotNull();
             assertThat(result.getContent()).hasSize(1);
@@ -229,8 +235,8 @@ class PolicyPagingServiceTest {
         public void filterByPolicyIdEqualsAndBpnEquals_noResult() {
 
             final Page<PolicyWithBpn> result = testee.getPolicies(policiesMap, PageRequest.of(0, 10),
-                    List.of(new SearchCriteria<>(AND, "policyId", EQUALS, "policy-4"),
-                            new SearchCriteria<>(AND, "bpn", EQUALS, "BPN2")));
+                    List.of(new SearchCriteria<>(AND, PROPERTY_POLICY_ID, EQUALS, "policy-4"),
+                            new SearchCriteria<>(AND, PROPERTY_BPN, EQUALS, "BPN2")));
 
             assertThat(result).isNotNull();
             assertThat(result.getContent()).isEmpty();
@@ -241,61 +247,58 @@ class PolicyPagingServiceTest {
 
             final Map<String, List<Policy>> policiesMap = Map.of( //
                     "BPN2", Arrays.asList( //
-                            createPolicy("policy-3"), //
-                            createPolicy("policy-22"), //
-                            createPolicy("policy-5") //
+                            createPolicy("policy-3", PolicyType.USE), //
+                            createPolicy("policy-22", PolicyType.USE), //
+                            createPolicy("policy-5", PolicyType.USE) //
                     ), "BPN1", Arrays.asList( //
-                            createPolicy("policy-2"), //
-                            createPolicy("policy-1") //
+                            createPolicy("policy-2", PolicyType.USE), //
+                            createPolicy("policy-1", PolicyType.USE) //
                     ) //
             );
 
             final Page<PolicyWithBpn> result = testee.getPolicies(policiesMap, PageRequest.of(0, 10),
-                    List.of(new SearchCriteria<>(AND, "policyId", STARTS_WITH, "policy-2")));
+                    List.of(new SearchCriteria<>(AND, PROPERTY_POLICY_ID, STARTS_WITH, "policy-2")));
 
             assertThat(result).isNotNull();
             assertThat(result.getContent()).hasSize(2);
 
-            final List<String> policies = result.getContent()
-                                                .stream()
-                                                .map(p -> toStringBuilder(p).append("BPN", p.bpn()) //
-                                                                            .append("policyId",
-                                                                                    p.policy().getPolicyId())
-                                                                            .toString())
-                                                .toList();
-            assertThat(policies).containsExactlyInAnyOrder("[BPN=BPN1,policyId=policy-2]",
-                    "[BPN=BPN2,policyId=policy-22]");
+            assertThat(result.getContent().stream().map(p -> {
+                return toStringBuilder(p).append(PROPERTY_BPN, p.bpn()) //
+                                         .append(PROPERTY_POLICY_ID, p.policy().getPolicyId()).toString();
+            }).toList()).containsExactlyInAnyOrder( //
+                    "[bpn=BPN1,policyId=policy-2]", "[bpn=BPN2,policyId=policy-22]");
         }
 
         @Test
-        public void filterByPolicyIdStartingWithAndByBpnEquals_shouldNarrowDown() {
+        public void filterByMultiple_shouldNarrowDown() {
 
             final Map<String, List<Policy>> policiesMap = Map.of( //
                     "BPN2", Arrays.asList( //
-                            createPolicy("policy-3"), //
-                            createPolicy("policy-22"), //
-                            createPolicy("policy-5") //
+                            createPolicy("policy-3", PolicyType.USE), //
+                            createPolicy("policy-22", PolicyType.USE), //
+                            createPolicy("policy-5", PolicyType.USE) //
                     ), "BPN1", Arrays.asList( //
-                            createPolicy("policy-2"), //
-                            createPolicy("policy-1") //
+                            createPolicy("policy-2", PolicyType.USE), //
+                            createPolicy("policy-222", PolicyType.ACCESS), //
+                            createPolicy("policy-1", PolicyType.USE) //
                     ) //
             );
 
             final Page<PolicyWithBpn> result = testee.getPolicies(policiesMap, PageRequest.of(0, 10),
-                    List.of(new SearchCriteria<>(AND, "policyId", STARTS_WITH, "policy-2"),
-                            new SearchCriteria<>(AND, "BPN", EQUALS, "BPN1")));
+                    List.of(new SearchCriteria<>(AND, PROPERTY_POLICY_ID, STARTS_WITH, "policy-2"),
+                            new SearchCriteria<>(AND, PROPERTY_BPN, EQUALS, "BPN1"),
+                            new SearchCriteria<>(AND, PROPERTY_ACTION, EQUALS, "use")));
 
             assertThat(result).isNotNull();
-            assertThat(result.getContent()).hasSize(1);
 
             final List<String> policies = result.getContent()
                                                 .stream()
-                                                .map(p -> toStringBuilder(p).append("BPN", p.bpn()) //
-                                                                            .append("policyId",
+                                                .map(p -> toStringBuilder(p).append(PROPERTY_BPN, p.bpn()) //
+                                                                            .append(PROPERTY_POLICY_ID,
                                                                                     p.policy().getPolicyId())
                                                                             .toString())
                                                 .toList();
-            assertThat(policies).containsExactlyInAnyOrder("[BPN=BPN1,policyId=policy-2]");
+            assertThat(policies).containsExactlyInAnyOrder("[bpn=BPN1,policyId=policy-2]");
         }
 
         @Test
@@ -320,17 +323,17 @@ class PolicyPagingServiceTest {
         }
     }
 
-    private Policy createPolicy(final String policyId) {
+    private Policy createPolicy(final String policyId, final PolicyType firstPermissionAction) {
         return Policy.builder()
                      .policyId(policyId)
                      .createdOn(OffsetDateTime.now())
                      .validUntil(OffsetDateTime.now())
-                     .permissions(createPermissions())
+                     .permissions(createPermissions(firstPermissionAction))
                      .build();
     }
 
-    private List<Permission> createPermissions() {
-        return List.of(new Permission(PolicyType.USE, createConstraints()),
+    private List<Permission> createPermissions(final PolicyType firstPermissionAction) {
+        return List.of(new Permission(firstPermissionAction, createConstraints()),
                 new Permission(PolicyType.ACCESS, createConstraints()));
     }
 
