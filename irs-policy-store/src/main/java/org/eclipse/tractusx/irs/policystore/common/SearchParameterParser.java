@@ -25,6 +25,7 @@ import java.util.List;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.tractusx.irs.policystore.models.SearchCriteria;
+import org.eclipse.tractusx.irs.policystore.models.SearchCriteria.JoinOperator;
 import org.eclipse.tractusx.irs.policystore.models.SearchCriteria.Operation;
 
 /**
@@ -41,6 +42,7 @@ public class SearchParameterParser {
 
     public static final String CRITERIA_INNER_SEPARATOR = ",";
     public static final int NUM_PARTS_OF_FILTERS = 3;
+    public static final int NUM_PARTS_OF_FILTERS_WITH_JOIN_OPERATOR = 4;
 
     private final List<SearchCriteria<?>> searchCriteria;
 
@@ -49,7 +51,9 @@ public class SearchParameterParser {
     }
 
     private List<SearchCriteria<?>> parseSearchParameters(final List<String> searchParameterList) {
+
         final List<SearchCriteria<?>> searchCriteria = new ArrayList<>();
+
         if (searchParameterList != null) {
             for (int i = 0; i < searchParameterList.size(); i++) {
 
@@ -62,14 +66,26 @@ public class SearchParameterParser {
                 }
 
                 final String property = getProperty(splittedSearchParam[0]);
-                final SearchCriteria.Operation operation = getOperation(splittedSearchParam[1], property);
+                final Operation operation = getOperation(splittedSearchParam[1], property);
                 final String value = getValue(splittedSearchParam[2]);
+                final JoinOperator joinOperator = getJoinOperator(splittedSearchParam);
 
-                searchCriteria.add(new SearchCriteria<>(property, operation, value));
+                searchCriteria.add(new SearchCriteria<>(joinOperator, property, operation, value));
             }
+
         }
 
         return searchCriteria;
+    }
+
+    private static JoinOperator getJoinOperator(final String[] splittedSearchParam) {
+        final JoinOperator joinOperator;
+        if (splittedSearchParam.length == NUM_PARTS_OF_FILTERS_WITH_JOIN_OPERATOR) {
+            joinOperator = JoinOperator.valueOf(StringUtils.trimToNull(splittedSearchParam[3]));
+        } else {
+            joinOperator = JoinOperator.AND;
+        }
+        return joinOperator;
     }
 
     private static String getValue(final String value) {

@@ -31,9 +31,18 @@ import lombok.Getter;
 @Getter
 public class SearchCriteria<T> {
 
-    private String property;
-    private Operation operation;
-    private T value;
+    private final JoinOperator joinOperator;
+    private final String property;
+    private final Operation operation;
+    private final T value;
+
+    /**
+     * Search filter join operator.
+     */
+    public enum JoinOperator {
+        AND,
+        OR
+    }
 
     /**
      * Search filter operation.

@@ -19,6 +19,9 @@
  ********************************************************************************/
 package org.eclipse.tractusx.irs.policystore.services;
 
+import static org.eclipse.tractusx.irs.policystore.models.SearchCriteria.JoinOperator.AND;
+import static org.eclipse.tractusx.irs.policystore.models.SearchCriteria.JoinOperator.OR;
+
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -174,15 +177,26 @@ public class PolicyPagingService {
         }
 
         /* package */ Predicate<PolicyWithBpn> build() {
-            Predicate<PolicyWithBpn> policyFilter = policy -> true;
+
+            Predicate<PolicyWithBpn> policyFilter = null;
 
             for (final SearchCriteria<?> searchCriteria : searchCriteriaList) {
 
                 final Predicate<PolicyWithBpn> fieldFilter = getPolicyPredicate(searchCriteria);
-                policyFilter = policyFilter.and(fieldFilter);
+                if (policyFilter == null) {
+                    policyFilter = fieldFilter;
+                } else {
+                    if (AND == searchCriteria.getJoinOperator()) {
+                        policyFilter = policyFilter.and(fieldFilter);
+                    } else if (OR == searchCriteria.getJoinOperator()) {
+                        policyFilter = policyFilter.or(fieldFilter);
+                    } else {
+                        throw new IllegalArgumentException("Unsupported join operator");
+                    }
+                }
             }
 
-            return policyFilter;
+            return policyFilter == null ? p -> true : policyFilter;
         }
 
         private Predicate<PolicyWithBpn> getPolicyPredicate(final SearchCriteria<?> searchCriteria) {
