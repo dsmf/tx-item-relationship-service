@@ -168,8 +168,10 @@ public class PolicyStoreController {
     @ApiResponses(
             value = { @ApiResponse(responseCode = "200", description = "Returns the policies as list of policies.",
                                    content = { @Content(mediaType = APPLICATION_JSON_VALUE,
-                                                        // TODO examples = @ExampleObject(PolicyResponse.BPN_TO_POLICY_MAP_EXAMPLE),
-                                                        schema = @Schema(description = "List of policies"))
+                                                        schema = @Schema(description = "List of policies",
+                                                                         implementation = List.class),
+                                                        examples = @ExampleObject(name = "success",
+                                                                                  ref = "#/components/examples/get-policies-by-id")),
                                    }),
                       @ApiResponse(responseCode = "401", description = UNAUTHORIZED_DESC,
                                    content = { @Content(mediaType = APPLICATION_JSON_VALUE,
@@ -280,7 +282,7 @@ public class PolicyStoreController {
                                           description = "Successfully retrieved the paged policies",
                                           content = @Content(mediaType = APPLICATION_JSON_VALUE,
                                                              schema = @Schema(implementation = Page.class),
-                                                             examples = @ExampleObject(name = "error",
+                                                             examples = @ExampleObject(name = "success",
                                                                                        ref = "#/components/examples/get-policies-paged-result"))),
 
                              @ApiResponse(responseCode = "401", description = UNAUTHORIZED_DESC,

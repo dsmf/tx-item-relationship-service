@@ -153,6 +153,7 @@ public class OpenApiExamples {
         components.addExamples("complete-job-list-processing-state", createJobListProcessingState());
         components.addExamples("aspect-models-list", createAspectModelsResult());
         components.addExamples("get-policies-paged-result", createPageOfPolicies());
+        components.addExamples("get-policies-by-id", createListOfPolicies());
     }
 
     private Example createPageOfPolicies() {
@@ -164,6 +165,19 @@ public class OpenApiExamples {
                       .permissions(createPermissions())
                       .build())), PageRequest.of(1, 10), 1);
         return toExample(page);
+    }
+
+    private Example createListOfPolicies() {
+        final List<PolicyWithBpn> policyWithBpn = List.of( //
+                new PolicyWithBpn("BPNL1234567890AB", Policy.builder()
+                                                            .policyId("13a8523f-c80a-40b8-9e43-faab47fbceaa")
+                                                            .createdOn(OffsetDateTime.parse(
+                                                                    "2024-07-08T12:01:19.4677109+02:00"))
+                                                            .validUntil(OffsetDateTime.parse(
+                                                                    "2025-07-08T12:01:19.4677109+02:00"))
+                                                            .permissions(createPermissions())
+                                                            .build()));
+        return toExample(policyWithBpn);
     }
 
     private List<Permission> createPermissions() {
