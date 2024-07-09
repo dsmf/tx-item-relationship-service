@@ -162,6 +162,52 @@ public class PolicyStoreController {
         return CreatePoliciesResponse.fromPolicy(registeredPolicy);
     }
 
+    @Operation(operationId = "getPolicyById", summary = "Gets policy by ID.",
+               security = @SecurityRequirement(name = API_KEY), tags = { POLICY_API_TAG },
+               description = "Gets policy by ID.")
+    @ApiResponses(
+            value = { @ApiResponse(responseCode = "200", description = "Returns the policies as list of policies.",
+                                   content = { @Content(mediaType = APPLICATION_JSON_VALUE,
+                                                        // TODO examples = @ExampleObject(PolicyResponse.BPN_TO_POLICY_MAP_EXAMPLE),
+                                                        schema = @Schema(description = "List of policies"))
+                                   }),
+                      @ApiResponse(responseCode = "401", description = UNAUTHORIZED_DESC,
+                                   content = { @Content(mediaType = APPLICATION_JSON_VALUE,
+                                                        schema = @Schema(implementation = ErrorResponse.class),
+                                                        examples = @ExampleObject(name = "error",
+                                                                                  ref = "#/components/examples/error-response-401"))
+                                   }),
+                      @ApiResponse(responseCode = "403", description = FORBIDDEN_DESC,
+                                   content = { @Content(mediaType = APPLICATION_JSON_VALUE,
+                                                        schema = @Schema(implementation = ErrorResponse.class),
+                                                        examples = @ExampleObject(name = "error",
+                                                                                  ref = "#/components/examples/error-response-403"))
+                                   }),
+            })
+    @GetMapping("/policies/{policyId}")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAuthority('" + IrsRoles.ADMIN_IRS + "')")
+    public List<PolicyResponse> getPolicyById(//
+            @PathVariable(required = true) //
+            @ValidPolicyId //
+            @Parameter(description = "Policy ID.") //
+            final String policyId //
+    ) {
+
+        final Map<String, String[]> parameterMap = this.httpServletRequest.getParameterMap();
+
+        final Map<String, List<Policy>> policies = service.getPolicies(null);
+
+        // TODO (mfischer): #750: return only one policy and List of BPN as attribute?!
+        // TODO (mfischer): #750: update insomnia
+        // TODO (mfischer): #750: update swagger
+        // TODO (mfischer): #750: add test
+        return policyPagingService.getPolicyWithBpnStream(policies)
+                                  .filter(p -> p.policy().getPolicyId().equals(policyId))
+                                  .map(p -> PolicyResponse.from(p.policy(), p.bpn()))
+                                  .toList();
+    }
+
     @Operation(operationId = "getAllowedPoliciesByBpn",
                summary = "Lists the registered policies that should be accepted in EDC negotiation.",
                security = @SecurityRequirement(name = API_KEY), tags = { POLICY_API_TAG },

@@ -31,6 +31,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -67,18 +68,20 @@ public class PolicyPagingService {
         final Comparator<PolicyWithBpn> comparator = new PolicyComparatorBuilder(pageable).build();
         final Predicate<PolicyWithBpn> filter = new PolicyFilterBuilder(searchCriteria).build();
 
-        final List<PolicyWithBpn> policies = bpnToPoliciesMap.entrySet()
-                                                             .stream()
-                                                             .flatMap(bpnWithPolicies -> bpnWithPolicies.getValue()
-                                                                                                        .stream()
-                                                                                                        .map(policy -> new PolicyWithBpn(
-                                                                                                                bpnWithPolicies.getKey(),
-                                                                                                                policy)))
-                                                             .filter(filter)
-                                                             .sorted(comparator)
-                                                             .toList();
+        final List<PolicyWithBpn> policies = getPolicyWithBpnStream(bpnToPoliciesMap).filter(filter)
+                                                                                     .sorted(comparator)
+                                                                                     .toList();
 
         return applyPaging(pageable, policies);
+    }
+
+    public Stream<PolicyWithBpn> getPolicyWithBpnStream(final Map<String, List<Policy>> bpnToPoliciesMap) {
+        return bpnToPoliciesMap.entrySet()
+                               .stream()
+                               .flatMap(bpnWithPolicies -> bpnWithPolicies.getValue()
+                                                                          .stream()
+                                                                          .map(policy -> new PolicyWithBpn(
+                                                                                  bpnWithPolicies.getKey(), policy)));
     }
 
     private PageImpl<PolicyWithBpn> applyPaging(final Pageable pageable, final List<PolicyWithBpn> policies) {
