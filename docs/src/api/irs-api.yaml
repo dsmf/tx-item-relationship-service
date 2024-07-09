@@ -1074,6 +1074,47 @@ paths:
       summary: Removes a policy that should no longer be accepted in EDC negotiation.
       tags:
         - Policy Store API
+    get:
+      description: Gets policy by ID.
+      operationId: getPolicyById
+      parameters:
+      - description: Policy ID.
+        in: path
+        name: policyId
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+                description: List of policies
+          description: Returns the policies as list of policies.
+        "401":
+          content:
+            application/json:
+              examples:
+                error:
+                  $ref: '#/components/examples/error-response-401'
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: No valid authentication credentials.
+        "403":
+          content:
+            application/json:
+              examples:
+                error:
+                  $ref: '#/components/examples/error-response-403'
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Authorization refused by server.
+      security:
+      - api_key: []
+      summary: Gets policy by ID.
+      tags:
+      - Policy Store API
   /irs/policies/{policyId}/bpnl/{bpnl}:
     delete:
       description: Removes a policy from BPNL that should no longer be accepted in
