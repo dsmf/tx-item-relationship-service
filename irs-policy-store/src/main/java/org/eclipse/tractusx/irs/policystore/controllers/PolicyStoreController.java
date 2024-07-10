@@ -321,6 +321,17 @@ public class PolicyStoreController {
         service.deletePolicy(policyId);
     }
 
+    @DeleteMapping("/policies")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAuthority('" + IrsRoles.ADMIN_IRS + "')")
+    public void deletePolicies(@RequestParam(required = false) @ValidListOfBusinessPartnerNumbers @Parameter(
+            description = "List of business partner numbers.") final List<String> businessPartnerNumbers) {
+
+        final Map<String, String[]> parameterMap = this.httpServletRequest.getParameterMap();
+
+        service.deletePolicies(businessPartnerNumbers);
+    }
+
     @Operation(operationId = "removeAllowedPolicyFromBpnl",
                summary = "Removes a policy from BPNL that should no longer be accepted in EDC negotiation.",
                security = @SecurityRequirement(name = API_KEY), tags = { POLICY_API_TAG },

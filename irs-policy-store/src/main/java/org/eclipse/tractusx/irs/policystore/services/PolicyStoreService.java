@@ -200,6 +200,17 @@ public class PolicyStoreService implements AcceptedPoliciesProvider {
         }
     }
 
+    public void deletePolicies(final List<String> businessPartnerNumbers) {
+        final List<String> bpnList;
+        if (businessPartnerNumbers.isEmpty()) {
+            bpnList = persistence.readAll().keySet().stream().toList();
+        } else {
+            bpnList = businessPartnerNumbers;
+        }
+
+        bpnList.forEach(persistence::deletePoliciesOfBpn);
+    }
+
     public void deletePolicyForEachBpn(final String policyId, final List<String> bpnList) {
         try {
             for (final String bpn : bpnList) {

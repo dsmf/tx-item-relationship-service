@@ -108,6 +108,16 @@ public class PolicyPersistence {
         });
     }
 
+    public void deletePoliciesOfBpn(final String bpn) {
+        writeLock(() -> {
+            try {
+                policyStorePersistence.delete(bpn, Collections.emptyList());
+            } catch (BlobPersistenceException e) {
+                throw new PolicyStoreException("Unable to delete policy data", e);
+            }
+        });
+    }
+
     @SuppressWarnings("PMD.AvoidCatchingGenericException")
     public List<Policy> readAll(final String bpn) {
         try {
