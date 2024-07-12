@@ -56,6 +56,7 @@ import org.eclipse.tractusx.irs.edc.client.policy.Policy;
 import org.eclipse.tractusx.irs.policystore.common.SearchParameterParser;
 import org.eclipse.tractusx.irs.policystore.models.CreatePoliciesResponse;
 import org.eclipse.tractusx.irs.policystore.models.CreatePolicyRequest;
+import org.eclipse.tractusx.irs.policystore.models.GetPolicyByIdResponse;
 import org.eclipse.tractusx.irs.policystore.models.PolicyResponse;
 import org.eclipse.tractusx.irs.policystore.models.PolicyWithBpn;
 import org.eclipse.tractusx.irs.policystore.models.SearchCriteria;
@@ -162,6 +163,7 @@ public class PolicyStoreController {
         return CreatePoliciesResponse.fromPolicy(registeredPolicy);
     }
 
+
     @Operation(operationId = "getPolicyById", summary = "Gets policy by ID.",
                security = @SecurityRequirement(name = API_KEY), tags = { POLICY_API_TAG },
                description = "Gets policy by ID.")
@@ -171,7 +173,7 @@ public class PolicyStoreController {
                                                         schema = @Schema(description = "List of policies",
                                                                          implementation = List.class),
                                                         examples = @ExampleObject(name = "success",
-                                                                                  ref = "#/components/examples/get-policies-by-id")),
+                                                                                  ref = "#/components/examples/get-policy-by-id")),
                                    }),
                       @ApiResponse(responseCode = "401", description = UNAUTHORIZED_DESC,
                                    content = { @Content(mediaType = APPLICATION_JSON_VALUE,
@@ -189,25 +191,25 @@ public class PolicyStoreController {
     @GetMapping("/policies/{policyId}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('" + IrsRoles.ADMIN_IRS + "')")
-    public List<PolicyResponse> getPolicyById(//
+    public GetPolicyByIdResponse getPolicyById(//
             @PathVariable(required = true) //
             @ValidPolicyId //
             @Parameter(description = "Policy ID.") //
             final String policyId //
     ) {
 
-        final Map<String, String[]> parameterMap = this.httpServletRequest.getParameterMap();
-
         final Map<String, List<Policy>> policies = service.getPolicies(null);
 
-        // TODO (mfischer): #750: return only one policy and List of BPN as attribute?!
         // TODO (mfischer): #750: update insomnia
-        // TODO (mfischer): #750: update swagger
         // TODO (mfischer): #750: add test
         return policyPagingService.getPolicyWithBpnStream(policies)
                                   .filter(p -> p.policy().getPolicyId().equals(policyId))
-                                  .map(p -> PolicyResponse.from(p.policy(), p.bpn()))
-                                  .toList();
+                                  // In MinIO we store the policy per BPN.
+                                  // Therefore, we can simply take the first one and collect the keys to get all the
+                                  // business partner numbers to which the policy is assigned.
+                                  .findFirst()
+                                  .map(p -> GetPolicyByIdResponse.from(p.policy(), policies.keySet().stream().toList()))
+                                  .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Policy not found"));
     }
 
     @Operation(operationId = "getAllowedPoliciesByBpn",

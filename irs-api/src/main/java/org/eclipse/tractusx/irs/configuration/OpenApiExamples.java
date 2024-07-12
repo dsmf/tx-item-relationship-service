@@ -77,6 +77,8 @@ import org.eclipse.tractusx.irs.edc.client.policy.Permission;
 import org.eclipse.tractusx.irs.edc.client.policy.Policy;
 import org.eclipse.tractusx.irs.edc.client.policy.PolicyType;
 import org.eclipse.tractusx.irs.ess.service.NotificationSummary;
+import org.eclipse.tractusx.irs.policystore.models.GetPolicyByIdResponse;
+import org.eclipse.tractusx.irs.policystore.models.Payload;
 import org.eclipse.tractusx.irs.policystore.models.PolicyWithBpn;
 import org.eclipse.tractusx.irs.semanticshub.AspectModel;
 import org.eclipse.tractusx.irs.semanticshub.AspectModels;
@@ -153,7 +155,7 @@ public class OpenApiExamples {
         components.addExamples("complete-job-list-processing-state", createJobListProcessingState());
         components.addExamples("aspect-models-list", createAspectModelsResult());
         components.addExamples("get-policies-paged-result", createPageOfPolicies());
-        components.addExamples("get-policies-by-id", createListOfPolicies());
+        components.addExamples("get-policy-by-id", createGetPolicyByIdResponse());
     }
 
     private Example createPageOfPolicies() {
@@ -167,17 +169,17 @@ public class OpenApiExamples {
         return toExample(page);
     }
 
-    private Example createListOfPolicies() {
-        final List<PolicyWithBpn> policyWithBpn = List.of( //
-                new PolicyWithBpn("BPNL1234567890AB", Policy.builder()
-                                                            .policyId("13a8523f-c80a-40b8-9e43-faab47fbceaa")
-                                                            .createdOn(OffsetDateTime.parse(
-                                                                    "2024-07-08T12:01:19.4677109+02:00"))
-                                                            .validUntil(OffsetDateTime.parse(
-                                                                    "2025-07-08T12:01:19.4677109+02:00"))
-                                                            .permissions(createPermissions())
-                                                            .build()));
-        return toExample(policyWithBpn);
+    private Example createGetPolicyByIdResponse() {
+        final OffsetDateTime validUntil = OffsetDateTime.parse("2025-07-08T12:01:19.4677109+02:00");
+        final String policyId = "13a8523f-c80a-40b8-9e43-faab47fbceaa";
+        final GetPolicyByIdResponse response = new GetPolicyByIdResponse(validUntil, new Payload(null, policyId,
+                Policy.builder()
+                      .policyId(policyId)
+                      .createdOn(OffsetDateTime.parse("2024-07-08T12:01:19.4677109+02:00"))
+                      .validUntil(validUntil)
+                      .permissions(createPermissions())
+                      .build()), List.of("BPNL1234567890AB", "BPNL1234567890CD"));
+        return toExample(response);
     }
 
     private List<Permission> createPermissions() {
