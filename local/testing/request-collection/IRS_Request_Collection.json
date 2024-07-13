@@ -70,6 +70,37 @@
 			"_type": "workspace"
 		},
 		{
+			"_id": "req_c661f4ae3e7c4819890b95e6554e20b4",
+			"parentId": "fld_ad061853620b45c397a7906a6e566930",
+			"modified": 1720518685138,
+			"created": 1720518675594,
+			"url": "{{IRS_HOST}}/irs/policies/{% prompt 'policyId', '', 'traceability-test', '', false, true %}",
+			"name": "Get policy by ID",
+			"description": "",
+			"method": "GET",
+			"body": {},
+			"parameters": [],
+			"headers": [],
+			"authentication": {
+				"type": "apikey",
+				"disabled": false,
+				"key": "X-API-KEY",
+				"value": "{{ _.ADMIN_API_KEY }}",
+				"addTo": "header"
+			},
+			"preRequestScript": "",
+			"metaSortKey": -1685420848885.0312,
+			"isPrivate": false,
+			"pathParameters": [],
+			"settingStoreCookies": true,
+			"settingSendCookies": true,
+			"settingDisableRenderRequestBody": false,
+			"settingEncodeUrl": true,
+			"settingRebuildPath": true,
+			"settingFollowRedirects": "global",
+			"_type": "request"
+		},
+		{
 			"_id": "req_aab54449fbd841e78741035a907a5516",
 			"parentId": "fld_ad061853620b45c397a7906a6e566930",
 			"modified": 1712736856772,
