@@ -102,7 +102,7 @@ public class PolicyPagingService {
         }
     }
 
-    public Stream<PolicyWithBpn> getPolicyWithBpnStream(final Map<String, List<Policy>> bpnToPoliciesMap) {
+    private Stream<PolicyWithBpn> getPolicyWithBpnStream(final Map<String, List<Policy>> bpnToPoliciesMap) {
         return bpnToPoliciesMap.entrySet()
                                .stream()
                                .flatMap(bpnWithPolicies -> bpnWithPolicies.getValue()
