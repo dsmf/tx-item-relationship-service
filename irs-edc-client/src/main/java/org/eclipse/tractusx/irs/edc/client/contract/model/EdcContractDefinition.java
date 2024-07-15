@@ -17,29 +17,45 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  ********************************************************************************/
-package org.eclipse.tractusx.irs.edc.client.exceptions;
+package org.eclipse.tractusx.irs.edc.client.contract.model;
 
-import java.util.List;
-
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
-import org.eclipse.edc.policy.model.Policy;
-import org.eclipse.tractusx.irs.edc.client.policy.AcceptedPolicy;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import org.eclipse.tractusx.irs.edc.client.asset.model.EdcContext;
 
 /**
- * Usage Policy Expired Exception errors in the contract negotiation.
+ * EdcCreateContractDefinitionRequest used for creating and receiving contract definitions
  */
+
+@ToString
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Getter
-public class UsagePolicyExpiredException extends EdcClientException implements PolicyException  {
+@Setter
+public class EdcContractDefinition {
 
-    private final transient Policy policy;
-    private final String businessPartnerNumber;
+    @JsonProperty("@context")
+    private EdcContext edcContext;
 
-    public UsagePolicyExpiredException(final List<AcceptedPolicy> acceptedPolicies,
-            final Policy providedCatalogItemPolicy, final String businessPartnerNumber) {
-        super("Policy " + acceptedPolicies.stream().map(policy -> policy.policy().getPolicyId()).toList()
-                + " has expired.");
-        this.policy = providedCatalogItemPolicy;
-        this.businessPartnerNumber = businessPartnerNumber;
-    }
+    @JsonProperty("@type")
+    private String type;
+
+    @JsonProperty("@id")
+    private String contractDefinitionId;
+
+    @JsonProperty("accessPolicyId")
+    private String accessPolicyId;
+
+    @JsonProperty("contractPolicyId")
+    private String contractPolicyId;
+
+    @JsonProperty("assetsSelector")
+    private EdcContractDefinitionCriteria assetsSelector;
 
 }

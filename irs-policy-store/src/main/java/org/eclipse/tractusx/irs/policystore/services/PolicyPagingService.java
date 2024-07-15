@@ -27,9 +27,11 @@ import static org.eclipse.tractusx.irs.policystore.common.CommonConstants.PROPER
 import static org.eclipse.tractusx.irs.policystore.models.SearchCriteria.Operation.EQUALS;
 import static org.eclipse.tractusx.irs.policystore.models.SearchCriteria.Operation.STARTS_WITH;
 
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -75,6 +77,31 @@ public class PolicyPagingService {
         return applyPaging(pageable, policies);
     }
 
+    private PageImpl<PolicyWithBpn> applyPaging(final Pageable pageable, final List<PolicyWithBpn> policies) {
+        final int start = Math.min(pageable.getPageNumber() * pageable.getPageSize(), policies.size());
+        final int end = Math.min((pageable.getPageNumber() + 1) * pageable.getPageSize(), policies.size());
+        final List<PolicyWithBpn> pagedPolicies = policies.subList(start, end);
+        return new PageImpl<>(pagedPolicies,
+                PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort()), policies.size());
+    }
+
+    public List<String> autocomplete(final Map<String, List<Policy>> bpnToPoliciesMap, final String field,
+            final String value, final int limit) {
+
+        if (PROPERTY_BPN.equalsIgnoreCase(field)) {
+            return bpnToPoliciesMap.keySet().stream().filter(t -> StringUtils.startsWithIgnoreCase(t, value)).toList();
+        } else {
+            final Function<PolicyWithBpn, String> fieldSelector = getFieldSelector(field);
+            final Stream<PolicyWithBpn> policyWithBpnStream = getPolicyWithBpnStream(bpnToPoliciesMap);
+            return policyWithBpnStream.map(fieldSelector)
+                                      .filter(s -> StringUtils.startsWithIgnoreCase(s, value))
+                                      .distinct()
+                                      .sorted()
+                                      .limit(limit)
+                                      .toList();
+        }
+    }
+
     public Stream<PolicyWithBpn> getPolicyWithBpnStream(final Map<String, List<Policy>> bpnToPoliciesMap) {
         return bpnToPoliciesMap.entrySet()
                                .stream()
@@ -84,13 +111,29 @@ public class PolicyPagingService {
                                                                                   bpnWithPolicies.getKey(), policy)));
     }
 
-    private PageImpl<PolicyWithBpn> applyPaging(final Pageable pageable, final List<PolicyWithBpn> policies) {
-        final int start = Math.min(pageable.getPageNumber() * pageable.getPageSize(), policies.size());
-        final int end = Math.min((pageable.getPageNumber() + 1) * pageable.getPageSize(), policies.size());
-        final List<PolicyWithBpn> pagedPolicies = policies.subList(start, end);
+    private Function<PolicyWithBpn, String> getFieldSelector(final String field) {
 
-        return new PageImpl<>(pagedPolicies,
-                PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort()), policies.size());
+        final Function<PolicyWithBpn, String> fieldSelector;
+
+        if (PROPERTY_BPN.equalsIgnoreCase(field)) {
+            fieldSelector = PolicyWithBpn::bpn;
+        } else if (PROPERTY_POLICY_ID.equalsIgnoreCase(field)) {
+            fieldSelector = p -> p.policy().getPolicyId();
+        } else if (PROPERTY_CREATED_ON.equalsIgnoreCase(field)) {
+            fieldSelector = p -> DateTimeFormatter.ofPattern("yyyy-MM-dd").format(p.policy().getCreatedOn());
+        } else if (PROPERTY_VALID_UNTIL.equalsIgnoreCase(field)) {
+            fieldSelector = p -> DateTimeFormatter.ofPattern("yyyy-MM-dd").format(p.policy().getValidUntil());
+        } else if (PROPERTY_ACTION.equalsIgnoreCase(field)) {
+            fieldSelector = p -> {
+                final List<Permission> permissions = p.policy().getPermissions();
+                return permissions == null || permissions.isEmpty() ? null : permissions.get(0).getAction().getValue();
+            };
+        } else {
+            log.warn("Field '{}' does not support autocomplete", field);
+            throw new IllegalArgumentException("Field does not support autocomplete");
+        }
+
+        return fieldSelector;
     }
 
     /**

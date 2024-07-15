@@ -17,37 +17,30 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  ********************************************************************************/
-package org.eclipse.tractusx.irs.edc.client.contract.model;
+package org.eclipse.tractusx.irs.edc.client.testutil;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
-import lombok.ToString;
-import org.eclipse.tractusx.irs.edc.client.asset.model.EdcContext;
+import java.lang.reflect.Method;
 
-/**
- * EdcCreateContractDefinitionRequest used for creation of contract
- */
+import org.junit.jupiter.api.DisplayNameGenerator;
 
-@ToString
-@Builder
-public class EdcCreateContractDefinitionRequest {
+public class CamelCaseToSpacesDisplayNameGenerator implements DisplayNameGenerator {
 
-    @JsonProperty("@context")
-    private EdcContext edcContext;
+    @Override
+    public String generateDisplayNameForClass(Class<?> testClass) {
+        return camelCaseToSpace(testClass.getSimpleName());
+    }
 
-    @JsonProperty("@type")
-    private String type;
+    @Override
+    public String generateDisplayNameForNestedClass(Class<?> nestedClass) {
+        return camelCaseToSpace(nestedClass.getSimpleName());
+    }
 
-    @JsonProperty("@id")
-    private String contractDefinitionId;
+    @Override
+    public String generateDisplayNameForMethod(Class<?> testClass, Method testMethod) {
+        return camelCaseToSpace(testMethod.getName());
+    }
 
-    @JsonProperty("accessPolicyId")
-    private String accessPolicyId;
-
-    @JsonProperty("contractPolicyId")
-    private String contractPolicyId;
-
-    @JsonProperty("assetsSelector")
-    private EdcContractDefinitionCriteria assetsSelector;
-
+    private String camelCaseToSpace(String name) {
+        return name.replaceAll("([a-z])([A-Z])", "$1 $2");
+    }
 }
