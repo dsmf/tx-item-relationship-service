@@ -39,9 +39,11 @@ import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import jakarta.json.JsonObject;
+import lombok.val;
 import org.assertj.core.api.AbstractThrowableAssert;
 import org.assertj.core.api.ThrowableAssert;
 import org.eclipse.edc.core.transform.TypeTransformerRegistryImpl;
@@ -58,6 +60,7 @@ import org.eclipse.tractusx.irs.policystore.config.DefaultAcceptedPoliciesConfig
 import org.eclipse.tractusx.irs.policystore.controllers.PolicyStoreControllerTest;
 import org.eclipse.tractusx.irs.policystore.exceptions.PolicyStoreException;
 import org.eclipse.tractusx.irs.policystore.models.CreatePolicyRequest;
+import org.eclipse.tractusx.irs.policystore.models.GetPolicyByIdResponse;
 import org.eclipse.tractusx.irs.policystore.models.UpdatePolicyRequest;
 import org.eclipse.tractusx.irs.policystore.persistence.PolicyPersistence;
 import org.eclipse.tractusx.irs.policystore.testutil.PolicyStoreTestUtil;
@@ -304,6 +307,49 @@ class PolicyStoreServiceTest {
             assertThat(constraints.getOr()).hasSize(2);
             assertThat(constraints.getAnd()).hasSize(2);
         }
+    }
+
+    @Nested
+    class GetPolicyByIdTests {
+
+        @Test
+        void getPolicyById() {
+            final Map<String, List<Policy>> policies = Map.of( //
+                    "BPNL1234567890CD", List.of( //
+                            Policy.builder()
+                                  .policyId("policy1")
+                                  .createdOn(OffsetDateTime.now())
+                                  .validUntil(OffsetDateTime.now())
+                                  .permissions(createPermissions())
+                                  .build()), //
+                    "BPNL1234567890EF", List.of( //
+                            Policy.builder()
+                                  .policyId("policy1")
+                                  .createdOn(OffsetDateTime.now())
+                                  .validUntil(OffsetDateTime.now())
+                                  .permissions(createPermissions())
+                                  .build(), //
+                            Policy.builder()
+                                  .policyId("policy2")
+                                  .createdOn(OffsetDateTime.now())
+                                  .validUntil(OffsetDateTime.now())
+                                  .permissions(createPermissions())
+                                  .build()));
+
+            when(persistenceMock.readAll()).thenReturn(policies);
+
+            final Optional<GetPolicyByIdResponse> optResult = testee.getPolicyById("policy1");
+            assertThat(optResult).isPresent();
+            final GetPolicyByIdResponse result = optResult.get();
+            assertThat(result.bpn()).containsExactlyInAnyOrder("BPNL1234567890CD", "BPNL1234567890EF");
+            assertThat(result.payload().policyId()).isEqualTo("policy1");
+        }
+
+        @Test
+        void notFound() {
+            assertThat( testee.getPolicyById("policyThatDoesNotExist")).isNotPresent();
+        }
+
     }
 
     @Nested

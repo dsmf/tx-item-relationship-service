@@ -54,6 +54,7 @@ import org.eclipse.tractusx.irs.edc.client.transformer.EdcTransformer;
 import org.eclipse.tractusx.irs.policystore.config.DefaultAcceptedPoliciesConfig;
 import org.eclipse.tractusx.irs.policystore.exceptions.PolicyStoreException;
 import org.eclipse.tractusx.irs.policystore.models.CreatePolicyRequest;
+import org.eclipse.tractusx.irs.policystore.models.GetPolicyByIdResponse;
 import org.eclipse.tractusx.irs.policystore.models.UpdatePolicyRequest;
 import org.eclipse.tractusx.irs.policystore.persistence.PolicyPersistence;
 import org.eclipse.tractusx.irs.policystore.validators.PolicyValidator;
@@ -80,6 +81,7 @@ public class PolicyStoreService implements AcceptedPoliciesProvider {
     private final Clock clock;
 
     private static final String DEFAULT = "default";
+
 
     /**
      * Constants for the configured default policy.
@@ -135,6 +137,24 @@ public class PolicyStoreService implements AcceptedPoliciesProvider {
         } catch (final PolicyStoreException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
         }
+    }
+
+    /**
+     * Find a policy by policy ID.
+     * @param policyId the policy ID
+     * @return Returns the policy including a list of associated business partner numbers.
+     */
+    public Optional<GetPolicyByIdResponse> getPolicyById(final String policyId) {
+        final Map<String, List<Policy>> policies = getPolicies(null);
+        return policies.values()
+                       .stream()
+                       .flatMap(Collection::stream)
+                       .filter(p -> p.getPolicyId().equals(policyId))
+                       // In MinIO we store the policy per BPN.
+                       // Therefore, we can simply take the first one and collect the keys to get all the
+                       // business partner numbers to which the policy is assigned.
+                       .findFirst()
+                       .map(p -> GetPolicyByIdResponse.from(p, policies.keySet().stream().toList()));
     }
 
     /**
