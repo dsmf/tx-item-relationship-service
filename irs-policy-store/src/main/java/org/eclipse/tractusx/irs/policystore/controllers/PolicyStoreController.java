@@ -163,7 +163,6 @@ public class PolicyStoreController {
         return CreatePoliciesResponse.fromPolicy(registeredPolicy);
     }
 
-
     @Operation(operationId = "getPolicyById", summary = "Gets policy by ID.",
                security = @SecurityRequirement(name = API_KEY), tags = { POLICY_API_TAG },
                description = "Gets policy by ID.")
@@ -192,24 +191,13 @@ public class PolicyStoreController {
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('" + IrsRoles.ADMIN_IRS + "')")
     public GetPolicyByIdResponse getPolicyById(//
-            @PathVariable(required = true) //
+            @PathVariable //
             @ValidPolicyId //
             @Parameter(description = "Policy ID.") //
             final String policyId //
     ) {
-
-        final Map<String, List<Policy>> policies = service.getPolicies(null);
-
-        // TODO (mfischer): #750: update insomnia
-        // TODO (mfischer): #750: add test
-        return policyPagingService.getPolicyWithBpnStream(policies)
-                                  .filter(p -> p.policy().getPolicyId().equals(policyId))
-                                  // In MinIO we store the policy per BPN.
-                                  // Therefore, we can simply take the first one and collect the keys to get all the
-                                  // business partner numbers to which the policy is assigned.
-                                  .findFirst()
-                                  .map(p -> GetPolicyByIdResponse.from(p.policy(), policies.keySet().stream().toList()))
-                                  .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Policy not found"));
+        return service.getPolicyById(policyId)
+                      .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Policy not found"));
     }
 
     @Operation(operationId = "getAllowedPoliciesByBpn",

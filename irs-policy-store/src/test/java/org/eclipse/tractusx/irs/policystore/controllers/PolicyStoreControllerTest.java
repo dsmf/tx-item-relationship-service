@@ -36,6 +36,7 @@ import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -59,6 +60,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.web.server.ResponseStatusException;
 
 @ExtendWith(MockitoExtension.class)
 public class PolicyStoreControllerTest {
@@ -152,6 +154,14 @@ public class PolicyStoreControllerTest {
 
     @Nested
     class GetPoliciesTests {
+
+        @Test
+        void getPolicyById() {
+            when(policyStoreServiceMock.getPolicyById("policyThatDoesNotExist")).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> testee.getPolicyById("policyThatDoesNotExist")).isInstanceOf(
+                    ResponseStatusException.class);
+        }
 
         @Test
         void getPolicies() {
