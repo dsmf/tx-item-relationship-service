@@ -43,7 +43,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import jakarta.json.JsonObject;
-import lombok.val;
 import org.assertj.core.api.AbstractThrowableAssert;
 import org.assertj.core.api.ThrowableAssert;
 import org.eclipse.edc.core.transform.TypeTransformerRegistryImpl;
@@ -347,7 +346,7 @@ class PolicyStoreServiceTest {
 
         @Test
         void notFound() {
-            assertThat( testee.getPolicyById("policyThatDoesNotExist")).isNotPresent();
+            assertThat(testee.getPolicyById("policyThatDoesNotExist")).isNotPresent();
         }
 
     }
