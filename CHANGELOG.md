@@ -10,6 +10,7 @@ _**For better traceability add the corresponding GitHub issue number in each cha
 
 ### Added
 
+- Added endpoint: `GET /irs/policies/{policyId}`. #803
 - Added autocomplete endpoint Policy Store API: `GET /irs/policies/attributes/{attribute}`. #750
 - Added get and delete functionality for contract definitions eclipse-tractusx/traceability-foss#1190
 
