@@ -25,6 +25,8 @@ package org.eclipse.tractusx.irs.policystore.controllers;
 
 import static org.eclipse.tractusx.irs.common.ApiConstants.FORBIDDEN_DESC;
 import static org.eclipse.tractusx.irs.common.ApiConstants.UNAUTHORIZED_DESC;
+import static org.eclipse.tractusx.irs.policystore.common.CommonConstants.PARAM_BUSINESS_PARTNER_NUMBERS;
+import static org.eclipse.tractusx.irs.policystore.common.CommonConstants.PARAM_SEARCH;
 import static org.eclipse.tractusx.irs.policystore.common.CommonConstants.PROPERTY_BPN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -54,9 +56,11 @@ import org.eclipse.tractusx.irs.common.auth.IrsRoles;
 import org.eclipse.tractusx.irs.data.JsonParseException;
 import org.eclipse.tractusx.irs.dtos.ErrorResponse;
 import org.eclipse.tractusx.irs.edc.client.policy.Policy;
+import org.eclipse.tractusx.irs.policystore.common.CommonConstants;
 import org.eclipse.tractusx.irs.policystore.common.SearchParameterParser;
 import org.eclipse.tractusx.irs.policystore.models.CreatePoliciesResponse;
 import org.eclipse.tractusx.irs.policystore.models.CreatePolicyRequest;
+import org.eclipse.tractusx.irs.policystore.models.PoliciesPagedRequest;
 import org.eclipse.tractusx.irs.policystore.models.PolicyResponse;
 import org.eclipse.tractusx.irs.policystore.models.PolicyWithBpn;
 import org.eclipse.tractusx.irs.policystore.models.SearchCriteria;
@@ -94,7 +98,9 @@ import org.springframework.web.server.ResponseStatusException;
 @RequiredArgsConstructor
 @SuppressWarnings({ "PMD.AvoidDuplicateLiterals",
                     "PMD.ExcessiveImports",
-                    "PMD.UseVarargs"
+                    "PMD.UseVarargs",
+                    "PMD.TooManyStaticImports"
+                    // actually this improves readability here
 })
 @Validated
 public class PolicyStoreController {
@@ -102,7 +108,6 @@ public class PolicyStoreController {
     public static final String BPN_REGEX = BusinessPartnerNumberListValidator.BPN_REGEX;
     public static final int DEFAULT_PAGE_SIZE = 10;
     public static final int MAX_PAGE_SIZE = 1000;
-    public static final String SEARCH = "search";
     public static final String POLICY_API_TAG = "Policy Store API";
     public static final String API_KEY = "api_key";
     public static final int MAX_AUTOCOMPLETE_LIMIT = 100;
@@ -307,15 +312,50 @@ public class PolicyStoreController {
             final Pageable pageable, //
             @RequestParam(required = false) //
             @ValidListOfBusinessPartnerNumbers(allowDefault = true) //
-            @Parameter(name = "businessPartnerNumbers", description = "List of business partner numbers. "
+            @Parameter(name = PARAM_BUSINESS_PARTNER_NUMBERS, description = "List of business partner numbers. "
                     + "This may also contain the value \"default\" in order to query the default policies.") //
+            @SuppressWarnings("unused") // needed for OpenAPI, not used directly as it is read from the parameter map
             final List<String> businessPartnerNumbers) {
+        return doGetPoliciesPaged(pageable, this.httpServletRequest.getParameterMap());
+    }
+
+    @PostMapping("/policies/paged")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Find policies.", //
+               description = "Fetch a page of policies with options to filter and sort.", //
+               security = @SecurityRequirement(name = API_KEY), //
+               tags = { POLICY_API_TAG }, //
+               responses = { //
+                             @ApiResponse(responseCode = "200",
+                                          description = "Successfully retrieved the paged policies",
+                                          content = @Content(mediaType = APPLICATION_JSON_VALUE,
+                                                             schema = @Schema(implementation = Page.class),
+                                                             examples = @ExampleObject(name = "success",
+                                                                                       ref = "#/components/examples/get-policies-paged-result"))),
+
+                             @ApiResponse(responseCode = "401", description = UNAUTHORIZED_DESC,
+                                          content = { @Content(mediaType = APPLICATION_JSON_VALUE,
+                                                               schema = @Schema(implementation = ErrorResponse.class),
+                                                               examples = @ExampleObject(name = "error",
+                                                                                         ref = "#/components/examples/error-response-401"))
+                                          }),
+                             @ApiResponse(responseCode = "403", description = FORBIDDEN_DESC,
+                                          content = { @Content(mediaType = APPLICATION_JSON_VALUE,
+                                                               schema = @Schema(implementation = ErrorResponse.class),
+                                                               examples = @ExampleObject(name = "error",
+                                                                                         ref = "#/components/examples/error-response-403"))
+                                          }),
+               })
+    @PreAuthorize("hasAuthority('" + IrsRoles.ADMIN_IRS + "')")
+    public Page<PolicyResponse> getPoliciesPagedPost(@Validated @RequestBody final PoliciesPagedRequest body) {
+        return doGetPoliciesPaged(body.getPageable(), body.getParameterMap());
+    }
+
+    private Page<PolicyResponse> doGetPoliciesPaged(final Pageable pageable, final Map<String, String[]> parameterMap) {
 
         if (pageable.getPageSize() > MAX_PAGE_SIZE) {
             throw new IllegalArgumentException("Page size too large");
         }
-
-        final Map<String, String[]> parameterMap = this.httpServletRequest.getParameterMap();
 
         ensureParamBusinessPartnerNumberCorrectlyNamed(parameterMap);
 
@@ -324,6 +364,9 @@ public class PolicyStoreController {
         // The described annotation Delimiter did not work either. Therefore, we read the params manually from request:
         final List<SearchCriteria<?>> searchCriteria = new SearchParameterParser(
                 getSearchParameters(parameterMap)).getSearchCriteria();
+        final String[] arrBusinessPartnerNumbers = parameterMap.get(PARAM_BUSINESS_PARTNER_NUMBERS);
+        final List<String> businessPartnerNumbers =
+                arrBusinessPartnerNumbers != null ? Arrays.asList(arrBusinessPartnerNumbers) : null;
         final Map<String, List<Policy>> bpnToPoliciesMap = service.getPolicies(businessPartnerNumbers);
         final Page<PolicyWithBpn> policies = policyPagingService.getPolicies(bpnToPoliciesMap, pageable,
                 searchCriteria);
@@ -331,7 +374,9 @@ public class PolicyStoreController {
     }
 
     private List<String> getSearchParameters(final Map<String, String[]> parameterMap) {
-        return parameterMap.get(SEARCH) != null ? Arrays.asList(parameterMap.get(SEARCH)) : Collections.emptyList();
+        return parameterMap.get(PARAM_SEARCH) != null
+                ? Arrays.asList(parameterMap.get(PARAM_SEARCH))
+                : Collections.emptyList();
     }
 
     private static void ensureParamBusinessPartnerNumberCorrectlyNamed(final Map<String, String[]> parameterMap) {

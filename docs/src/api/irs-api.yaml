@@ -1099,6 +1099,48 @@ paths:
       summary: Find policies.
       tags:
       - Policy Store API
+    post:
+      description: Fetch a page of policies with options to filter and sort.
+      operationId: getPoliciesPagedPost
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PoliciesPagedRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              examples:
+                success:
+                  $ref: '#/components/examples/get-policies-paged-result'
+              schema:
+                $ref: '#/components/schemas/Page'
+          description: Successfully retrieved the paged policies
+        "401":
+          content:
+            application/json:
+              examples:
+                error:
+                  $ref: '#/components/examples/error-response-401'
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: No valid authentication credentials.
+        "403":
+          content:
+            application/json:
+              examples:
+                error:
+                  $ref: '#/components/examples/error-response-403'
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Authorization refused by server.
+      security:
+      - api_key: []
+      summary: Find policies.
+      tags:
+      - Policy Store API
   /irs/policies/{policyId}:
     delete:
       description: Removes a policy that should no longer be accepted in EDC negotiation.
@@ -2619,6 +2661,53 @@ components:
       required:
       - bpn
       - globalAssetId
+    PoliciesPagedRequest:
+      type: object
+      additionalProperties: false
+      description: Request to query policies
+      properties:
+        businessPartnerNumbers:
+          type: array
+          description: List of business partner numbers. This may also contain the
+            value "default" in order to query the default policies.
+          items:
+            type: string
+            description: List of business partner numbers. This may also contain the
+              value "default" in order to query the default policies.
+        page:
+          type: integer
+          format: int32
+          description: Page number
+        search:
+          type: array
+          description: |
+            Search parameters, each in the following form:
+            `<property>,[EQUALS|STARTS_WITH|BEFORE_LOCAL_DATE|AFTER_LOCAL_DATE],<value>`.
+            Example:
+            `["BPN,STARTS_WITH,BPNL12", "policyId,STARTS_WITH,policy2", "validUntil,AFTER_LOCAL_DATE,2024-06-05"]`.
+          items:
+            type: string
+            description: |
+              Search parameters, each in the following form:
+              `<property>,[EQUALS|STARTS_WITH|BEFORE_LOCAL_DATE|AFTER_LOCAL_DATE],<value>`.
+              Example:
+              `["BPN,STARTS_WITH,BPNL12", "policyId,STARTS_WITH,policy2", "validUntil,AFTER_LOCAL_DATE,2024-06-05"]`.
+        size:
+          type: integer
+          format: int32
+          description: Page size
+        sort:
+          type: array
+          description: |
+            Sort parameters, each in the following form:
+            `<property>,[asc|desc]`.
+             Example: `["BPN,asc", "policyId,desc"]`.
+          items:
+            type: string
+            description: |
+              Sort parameters, each in the following form:
+              `<property>,[asc|desc]`.
+               Example: `["BPN,asc", "policyId,desc"]`.
     ProcessingError:
       type: object
       additionalProperties: false

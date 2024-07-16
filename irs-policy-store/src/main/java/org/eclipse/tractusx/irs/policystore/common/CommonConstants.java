@@ -23,9 +23,13 @@ package org.eclipse.tractusx.irs.policystore.common;
  * Common constants.
  */
 public class CommonConstants {
+
     public static final String PROPERTY_BPN = "bpn";
     public static final String PROPERTY_POLICY_ID = "policyId";
     public static final String PROPERTY_ACTION = "action";
     public static final String PROPERTY_CREATED_ON = "createdOn";
     public static final String PROPERTY_VALID_UNTIL = "validUntil";
+
+    public static final String PARAM_BUSINESS_PARTNER_NUMBERS = "businessPartnerNumbers";
+    public static final String PARAM_SEARCH = "search";
 }
