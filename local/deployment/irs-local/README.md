@@ -4,7 +4,7 @@
 
 ### Step 1: Prerequisites
 
-1. [Docker](https://docs.docker.com/get-docker/) is installed and the Docker deamon is running with at least 8GB of memory
+1. [Docker](https://docs.docker.com/get-docker/) is installed and the Docker daemon is running with at least 8GB of memory
 2. [helm](https://helm.sh/docs/intro/install/) is installed
 3. Any Kubernetes cluster is installed and running, eg. [Minikube](https://minikube.sigs.k8s.io/docs/start/)
 4. [kubectl](https://kubernetes.io/docs/tasks/tools/) is installed
