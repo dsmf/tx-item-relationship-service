@@ -217,13 +217,13 @@ public class PolicyStoreService implements AcceptedPoliciesProvider {
 
     public Map<String, List<Policy>> getAllStoredPolicies() {
         final Map<String, List<Policy>> bpnToPolicies = persistence.readAll();
-        if (containsNoDefaultPolicyAvailable(bpnToPolicies)) {
+        if (containsNoDefaultPolicy(bpnToPolicies)) {
             bpnToPolicies.put("default", allowedPoliciesFromConfig);
         }
         return bpnToPolicies;
     }
 
-    private static boolean containsNoDefaultPolicyAvailable(final Map<String, List<Policy>> bpnToPolicies) {
+    private static boolean containsNoDefaultPolicy(final Map<String, List<Policy>> bpnToPolicies) {
         return bpnToPolicies.keySet().stream().noneMatch(key -> StringUtils.isEmpty(key) || DEFAULT.equals(key));
     }
 
