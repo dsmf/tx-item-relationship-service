@@ -313,27 +313,35 @@ class PolicyStoreServiceTest {
 
         @Test
         void getPolicyById() {
-            final Map<String, List<Policy>> policies = Map.of( //
-                    "BPNL1234567890CD", List.of( //
-                            Policy.builder()
-                                  .policyId("policy1")
-                                  .createdOn(OffsetDateTime.now())
-                                  .validUntil(OffsetDateTime.now())
-                                  .permissions(createPermissions())
-                                  .build()), //
-                    "BPNL1234567890EF", List.of( //
-                            Policy.builder()
-                                  .policyId("policy1")
-                                  .createdOn(OffsetDateTime.now())
-                                  .validUntil(OffsetDateTime.now())
-                                  .permissions(createPermissions())
-                                  .build(), //
-                            Policy.builder()
-                                  .policyId("policy2")
-                                  .createdOn(OffsetDateTime.now())
-                                  .validUntil(OffsetDateTime.now())
-                                  .permissions(createPermissions())
-                                  .build()));
+            final Map<String, List<Policy>> policies = new HashMap<>();
+
+            policies.put("BPNL1234567890CD", List.of( //
+                    Policy.builder()
+                          .policyId("policy1")
+                          .createdOn(OffsetDateTime.now())
+                          .validUntil(OffsetDateTime.now())
+                          .permissions(createPermissions())
+                          .build()));
+            policies.put("BPNL1234567890EF", List.of( //
+                    Policy.builder()
+                          .policyId("policy1")
+                          .createdOn(OffsetDateTime.now())
+                          .validUntil(OffsetDateTime.now())
+                          .permissions(createPermissions())
+                          .build(), //
+                    Policy.builder()
+                          .policyId("policy2")
+                          .createdOn(OffsetDateTime.now())
+                          .validUntil(OffsetDateTime.now())
+                          .permissions(createPermissions())
+                          .build()));
+            policies.put("BPNL1234567890GH", List.of( //
+                    Policy.builder()
+                          .policyId("policy3")
+                          .createdOn(OffsetDateTime.now())
+                          .validUntil(OffsetDateTime.now())
+                          .permissions(createPermissions())
+                          .build()));
 
             when(persistenceMock.readAll()).thenReturn(policies);
 

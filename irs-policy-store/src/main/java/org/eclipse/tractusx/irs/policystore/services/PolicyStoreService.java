@@ -29,7 +29,6 @@ import java.time.Clock;
 import java.time.OffsetDateTime;
 import java.util.AbstractMap;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
@@ -56,6 +55,7 @@ import org.eclipse.tractusx.irs.policystore.config.DefaultAcceptedPoliciesConfig
 import org.eclipse.tractusx.irs.policystore.exceptions.PolicyStoreException;
 import org.eclipse.tractusx.irs.policystore.models.CreatePolicyRequest;
 import org.eclipse.tractusx.irs.policystore.models.GetPolicyByIdResponse;
+import org.eclipse.tractusx.irs.policystore.models.PolicyWithBpn;
 import org.eclipse.tractusx.irs.policystore.models.UpdatePolicyRequest;
 import org.eclipse.tractusx.irs.policystore.persistence.PolicyPersistence;
 import org.eclipse.tractusx.irs.policystore.validators.PolicyValidator;
@@ -146,12 +146,31 @@ public class PolicyStoreService implements AcceptedPoliciesProvider {
      * @return Returns the policy including a list of associated business partner numbers.
      */
     public Optional<GetPolicyByIdResponse> getPolicyById(final String policyId) {
-        final Map<String, List<Policy>> policies = getPolicies(null);
-        return policies.values().stream().flatMap(Collection::stream).filter(p -> p.getPolicyId().equals(policyId))
-                       // In MinIO we store the policy per BPN.
-                       // Therefore, we can simply take the first one and collect the keys to get all the
-                       // business partner numbers to which the policy is assigned.
-                       .findFirst().map(p -> GetPolicyByIdResponse.from(p, policies.keySet().stream().toList()));
+        final Map<String, List<Policy>> policiesMap = getPolicies(null);
+        final List<PolicyWithBpn> policiesWithBpn = getPolicyWithBpnStream(policiesMap);
+        final List<PolicyWithBpn> matchingPolicies = policiesWithBpn.stream()
+                                                                    .filter(p -> p.policy() != null)
+                                                                    .filter(p -> p.policy()
+                                                                                  .getPolicyId()
+                                                                                  .equals(policyId))
+                                                                    .toList();
+        final List<String> associatedBusinessPartnerNumbers = matchingPolicies.stream()
+                                                                              .map(PolicyWithBpn::bpn)
+                                                                              .toList();
+        return matchingPolicies.stream()
+                               // In MinIO we store the policy per BPN.
+                               .findFirst() //
+                               .map(p -> GetPolicyByIdResponse.from(p.policy(), associatedBusinessPartnerNumbers));
+    }
+
+    private List<PolicyWithBpn> getPolicyWithBpnStream(final Map<String, List<Policy>> bpnToPoliciesMap) {
+        return bpnToPoliciesMap.entrySet()
+                               .stream()
+                               .flatMap(bpnWithPolicies -> bpnWithPolicies.getValue()
+                                                                          .stream()
+                                                                          .map(policy -> new PolicyWithBpn(
+                                                                                  bpnWithPolicies.getKey(), policy)))
+                               .toList();
     }
 
     /**
