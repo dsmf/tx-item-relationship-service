@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 2.0.18">
-<title>Building block view</title>
+<title>Testing concepts</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
 /*! Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
@@ -439,592 +439,97 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </head>
 <body class="article toc2 toc-left">
 <div id="header">
-<h1>Building block view</h1>
+<h1>Testing concepts</h1>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#_whitebox_overall_system">Whitebox overall system</a>
-<ul class="sectlevel2">
-<li><a href="#_component_diagram">Component diagram</a></li>
-<li><a href="#_component_description">Component description</a></li>
-</ul>
-</li>
-<li><a href="#_level_1">Level 1</a>
-<ul class="sectlevel2">
-<li><a href="#_component_diagram_2">Component diagram</a></li>
-<li><a href="#_component_description_2">Component description</a></li>
-</ul>
-</li>
-<li><a href="#_level_2">Level 2</a>
-<ul class="sectlevel2">
-<li><a href="#_irs_controller">IRS controller</a></li>
-<li><a href="#_recursivejobhandler">RecursiveJobHandler</a></li>
-<li><a href="#_transferprocessmanagement">TransferProcessManagement</a></li>
-<li><a href="#_aastransferprocessmanager">AASTransferProcessManager</a></li>
-<li><a href="#_ess_controller">ESS controller</a></li>
-</ul>
-</li>
-<li><a href="#_irs_api">IRS API</a>
-<ul class="sectlevel2">
-<li><a href="#_references">References</a></li>
-<li><a href="#_irs_interaction_diagram">IRS interaction diagram</a></li>
-<li><a href="#_ess_investigation_interaction_diagram">ESS Investigation interaction diagram</a></li>
-</ul>
-</li>
+<li><a href="#_umbrella">Umbrella</a></li>
 </ul>
 </div>
 </div>
 <div id="content">
 <div class="sect1">
-<h2 id="_whitebox_overall_system">Whitebox overall system</h2>
+<h2 id="_umbrella">Umbrella</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The interfaces show how the components interact with each other and which interfaces the IRS is providing.</p>
+<p>The <a href="https://github.com/eclipse-tractusx/tractus-x-umbrella">umbrella chart</a> provides a pre-configured catena-x network which includes all necessary components for the IRS to work.</p>
 </div>
-<div class="sect2">
-<h3 id="_component_diagram">Component diagram</h3>
-<div class="imageblock">
-<div class="content">
-<img src="whitebox_overall_decentral.svg" alt="whitebox overall decentral" width="2773" height="871">
+<div class="paragraph">
+<p>For IRS this includes:</p>
 </div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_component_description">Component description</h3>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Components</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">IRSApiConsumer</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Proxy for any consumer of the IRS api.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">IRS</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The IRS consumes relationship information across the CX-network and builds the graph view. Within this documentation, the focus lies on the IRS</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Policy Store</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The Policy Store component stores usage policies used to validate the consumption of data asset.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">EDC Consumer</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The EDC Consumer component is there to fulfill the GAIA-X and IDSA-data sovereignty principles. The EDC Consumer consists of a control plane and a data plane.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">EDC Provider</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The EDC Provider Component connects with EDC Consumer component and forms the end point for the actual exchange of data. It handles automatic contract negotiation and the subsequent exchange of data assets for connected applications.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Submodel Server</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The Submodel Server offers endpoints for requesting the Submodel aspects.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">MIW</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Managed Identity Wallet as Self-Sovereign-Identity Provider for EDC</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Discovery Finder</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The Discovery Finder is used to get the EDC Discovery Endpoint for a certain type of identification, e.g. BPNL.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">EDC Discovery</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The EDC Discovery Service is used to get EDC endpoints for a certain BPNL.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Semantic Hub</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Semantic Hub provides information about semantic models in a specific version. This also includes JSON schemas, which IRS uses to validate the payload received by data providers.</p></td>
-</tr>
-</tbody>
-</table>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Number</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">01</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">IrsApiConsumer calls the <strong>IRS</strong> public /irs <strong>API</strong></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">02</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">IrsApiConsumer must authorize using <strong>technical C-X User</strong></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">03</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Delegate authorization request to <strong>IdP</strong></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">04</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">IRS requesting for <strong>SubmodelAspects</strong> using <strong>EDC</strong></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">05</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">IRS requesting the <strong>decentral DigitalTwinRegistry</strong> over <strong>EDC</strong> and service discovery flow</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">06</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">IRS uses EDC to ensure sovereign data consumption</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">07</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">IRS MUST authorize at central IAM</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">08</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">IRS lookup for EDC Provider by given BPNs over the <strong>EDC Discovery Service</strong></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">09</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">IRS lookup for <strong>EDC Discovery Services</strong> by given type &lt;BPN&gt; over the <strong>Discovery Finder</strong></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">10</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">IRS uses <strong>Semantic Hub</strong> to validate of <strong>SubmodelAspects</strong> payloads agains the schema provided in <strong>Semantic Hub</strong></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">11</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>EDC</strong> is connected to <strong>Managed Identity Wallet</strong> for access policy check for data offers</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">12</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>EDC</strong> communication covering negotiation and data consumption</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">13</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>EDC</strong> is connected to <strong>Managed Identity Wallet</strong> for access policy check for data offers</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">14</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>IRS</strong> accessing to <strong>SubmodelServer</strong> on Tier Level using the <strong>EDC</strong></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">15</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>IRS</strong> accessing the <strong>decentral DigitalTwinRegistry</strong> on Tier Level using the <strong>EDC</strong></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">16</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">In case of the use-case Environmental and Social Standards, <strong>IRS</strong> sends notifications to the <strong>IRS-ESS</strong> instance running at the data provider using the <strong>EDC</strong>.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">17</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>IRS</strong> uses the Policy Store to load the usage policies stored for BPNLs in order to check the usage policies during the consumption of the data assets.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">18</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">IrsApiConsumer calls the IRS public /policy <strong>API</strong></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_level_1">Level 1</h2>
-<div class="sectionbody">
-<div class="sect2">
-<h3 id="_component_diagram_2">Component diagram</h3>
-<div class="imageblock">
-<div class="content">
-<img src="level-1.svg" alt="level 1" width="840" height="1031">
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_component_description_2">Component description</h3>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Components</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>IRS</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The IRS builds a digital representation of a product (digital twin) and the relationships of items the product consists of in a hierarchical structure.</p>
-<p class="tableblock">The result is an item graph in which each node represents a digital item of the product - this graph is called "Item Graph".</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>IRS API</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The <strong>IRS API</strong> is the Interface over which the Data Consumer is communicating.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>IrsController</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The <strong>IrsController</strong> provides a REST Interface for retrieving IRS processed data and job details of the current item graph retrieval process.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>IrsItemGraphQueryService</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The <strong>IrsItemGraphQueryService</strong> implements the REST Interface of the IrsController.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>JobOrchestrator</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The <strong>JobOrchestrator</strong> is a component which manages (start, end, cancel, resume) the jobs which execute the item graph retrieval process.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>RecursiveJobHandler</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The <strong>RecursiveJobHandler</strong> handles the job execution recursively until a given abort criteria is reached or the complete item graph is build.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>TransferProcessManager</strong></p></td>
-<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
-<p>The TransferProcessManager handles the outgoing requests to the various data services.
-A job is processed in this order:</p>
-</div>
-<div class="olist arabic">
-<ol class="arabic">
+<div class="ulist">
+<ul>
 <li>
-<p>Initiation of the job and preparation of the stream of <strong>DataRequests</strong></p>
+<p>Central Idp</p>
 </li>
 <li>
-<p><strong>RecursiveJobHandler</strong> requesting for AAS via the Digital Twin registry.</p>
+<p>Edc Provider</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Digital Twin Registry</p>
 </li>
 <li>
-<p>Analyzing the structure of the AAS response by collecting the traversal aspect.</p>
+<p>Submodel Backend</p>
 </li>
 <li>
-<p>Requesting submodel data for given items of next level.</p>
+<p>EDC</p>
 </li>
 <li>
-<p>Recursively iteration over step 2-4 until an abort criterion is reached.</p>
+<p>Vault</p>
+</li>
+</ul>
+</div>
 </li>
 <li>
-<p>Assembles the complete item graph.</p>
+<p>EDC Consumer</p>
+<div class="ulist">
+<ul>
+<li>
+<p>EDC</p>
 </li>
-</ol>
-</div></div></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>BlobStore</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The BlobStore is the database where the relationships and tombstones are stored for a requested item.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>JobStore</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The JobStore is the database where the jobs with the information about the requested item are stored.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Digital Twin Client</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The Digital Twin Client is the interface to the Digital Twin Registry. It provides an interface for the Asset Administration Shells.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Decentralized Digital Twin Client</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">In a decentralized network, the Digital Twin Client connects to the EDC which then proxies the requests to the digital twin registry on provider side.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>EDC Client</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The EDC Client is used to communicate with the EDC network, negotiate contracts and retrieve submodel data.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>EssController</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The <strong>EssController</strong> provides a REST Interface to perform BPN investigations of supply chain.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>PolicyStoreController</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The <strong>PolicyStoreController</strong> provides a REST Interface for getting, adding and deleting accepted IRS EDC policies. These policies will be used to validate usage policies of EDC contract offers.</p></td>
-</tr>
-</tbody>
-</table>
+<li>
+<p>Vault</p>
+</li>
+</ul>
 </div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_level_2">Level 2</h2>
-<div class="sectionbody">
-<div class="sect2">
-<h3 id="_irs_controller">IRS controller</h3>
-<div class="paragraph">
-<p>The IRS REST controller is used to provide a RESTful web service.</p>
-</div>
-<div class="sect3">
-<h4 id="_component_diagram_3">Component diagram</h4>
-<div class="imageblock">
-<div class="content">
-<img src="level-2-controller.svg" alt="level 2 controller" width="659" height="568">
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_component_description_3">Component description</h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Components</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">IrsController</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Application REST controller.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">IrsItemGraphQueryService</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Service for retrieving item graph.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">JobOrchestrator</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Orchestrator service for recursive MultiTransferJobs that potentially comprise multiple transfers.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">JobStore</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Spring configuration for job-related beans.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">BlobstorePersistence</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Interface for storing data blobs.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Policy Store</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The <strong>Policy Store</strong> provides a REST Interface for getting, adding and deleting accepted IRS EDC policies. These policies will be used to validate usage policies of EDC contract offers.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_recursivejobhandler">RecursiveJobHandler</h3>
-<div class="paragraph">
-<p>The <strong>RecursiveJobHandler</strong> component provide the logic to build jobs recursively to retrieve items over the complete C-X network and assembles the partial results into a single item graph result.</p>
-</div>
-<div class="sect3">
-<h4 id="_component_diagram_4">Component diagram</h4>
-<div class="imageblock">
-<div class="content">
-<img src="level-2-jobhandler.svg" alt="level 2 jobhandler" width="752" height="280">
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_component_description_4">Component description</h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Components</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">AASRecursiveJobHandler</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Recursive job handler for AAS data</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">TreeRecursiveLogic</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Retrieves item graphs from potentially multiple calls to IRS API behind multiple EDC Providers, and assembles their outputs into one overall item graph.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">ItemTreesAssembler</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Assembles multiple partial item graphs into one overall item graph.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">BlobPersistence</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Interface for storing data blobs.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_transferprocessmanagement">TransferProcessManagement</h3>
-<div class="paragraph">
-<p>The TransferProcessManager creates executions and provides them to the executor service. Each execution contains HTTP requests to the asset administration shell registry and to the submodel interface.</p>
-</div>
-<div class="sect3">
-<h4 id="_component_diagram_5">Component diagram</h4>
-<div class="imageblock">
-<div class="content">
-<img src="level-2-transfer-process-management.svg" alt="level 2 transfer process management" width="1506" height="1017">
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_component_description_5">Component description</h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Components</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">TransferProcessManager</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The TransferProcessManager manages the requests to the EDC and DigitalTwinRegistry.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">DigitalTwinRegistryFacade</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The DigitalTwinRegistryFacade calls the DigitalTwinRegistry to retrieve data form the AAS registry and transforms the response to internal data models.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">SubmodelFacade</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The SubmodelFacade handles EDC contract negotiations and is responsible for the EDC dataplane requests to retrieve data from the submodel servers.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">BlobStore</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The BlobStore is the database where the relationships and tombstones are stored for a requested item.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">DigitalTwinRegistry</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The DigitalTwinRegistry is the central database of registered assets. In a decentralized network, the registry is no longer central, but every provider has its own registry.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">ExecutorService</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The ExecutorService enables the simultaneous execution of requests of transfer processes.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_aastransferprocessmanager">AASTransferProcessManager</h3>
-<div class="paragraph">
-<p>The AASTransferProcessManager coordinates creation of Runnables which are then passed to the ExecutorService for asynchronous and parallel execution.
-The Runnable consists of different Delegates which are each responsible for requesting certain types of data.</p>
-</div>
-<div class="sect3">
-<h4 id="_component_diagram_6">Component diagram</h4>
-<div class="imageblock">
-<div class="content">
-<img src="level-2-int-transfer-process-delegate.svg" alt="level 2 int transfer process delegate" width="743" height="615">
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_component_description_6">Component description</h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Components</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">DigitalTwinDelegate</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Request the digital twin for the globalAssetId. The result is stored in "shells" of the job response.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">RelationshipDelegate</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Request the payload for relationship aspects, found in the DTR. Relationships are mapped to the internal linkedItem data structure of IRS and validated to be within the supported major Traversal Aspect version range which can be found in the technical context.
-The result is stored in "relationships" of the job response.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">SubmodelDelegate</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Request the payload for the other semantic models requested by the Job. The result is stored in "submodels" of the job response.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_ess_controller">ESS controller</h3>
-<div class="paragraph">
-<p>The ESS REST controller is used to provide a RESTful web service to related Environmental and Social Standards functionalities.</p>
-</div>
-<div class="sect3">
-<h4 id="_component_diagram_7">Component diagram</h4>
-<div class="imageblock">
-<div class="content">
-<img src="level-2-ess-controller.svg" alt="level 2 ess controller" width="627" height="445">
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_component_description_7">Component description</h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Components</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">EssService</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Service contains business logic for investigation if part is inside supply chain.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">IrsItemGraphQueryService</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Service for retrieving item graph.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">BpnInvestigationJobCache</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Interface for storing incident data blobs.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">EssRecursiveNotificationHandler</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Business logic handling recursive investigation and results calculation. Responsible for sending and receiving EDC notifications.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_irs_api">IRS API</h2>
-<div class="sectionbody">
-<div class="sect2">
-<h3 id="_references">References</h3>
-<div class="paragraph">
-<p>The Swagger documentation can be found in the local deployment of the reference application. More information can be found in the GitHub repository: <a href="https://github.com/eclipse-tractusx/item-relationship-service/blob/main/README.md" class="bare">https://github.com/eclipse-tractusx/item-relationship-service/blob/main/README.md</a></p>
+</li>
+<li>
+<p>Discovery Service</p>
+</li>
+<li>
+<p>EDC Discovery *</p>
+</li>
+<li>
+<p>IATP *</p>
+</li>
+<li>
+<p>BDRS</p>
+</li>
+<li>
+<p>Semantic Hub</p>
+</li>
+</ul>
 </div>
 <div class="paragraph">
-<p>Since we cannot rely on synchronous responses regarding the requests of submodel endpoints, we designed the IRS in a way that it will handle the job management of requesting all needed endpoints in order to build a BoM tree.</p>
+<p>Services marked with * are currently mocked, since there is no FOSS-Component available for IATP/DIM and the configuration and data seeding for EDC Discovery is not possible at the moment.</p>
 </div>
+<div class="paragraph">
+<p>These Service are used together with the IRS Helm Chart to provide a E2E Testing Infrastructure which can be spun up directly in a GitHub Workflow to execute E2E Tests against.</p>
 </div>
-<div class="sect2">
-<h3 id="_irs_interaction_diagram">IRS interaction diagram</h3>
-<div class="imageblock">
-<div class="content">
-<img src="irs-api.svg" alt="irs api" width="491" height="577">
+<div class="paragraph">
+<p>The action <a href="https://github.com/eclipse-tractusx/item-relationship-service/blob/main/.github/actions/setup-umbrella-env/action.yaml" class="bare">https://github.com/eclipse-tractusx/item-relationship-service/blob/main/.github/actions/setup-umbrella-env/action.yaml</a> creates this environment and seeds Testdata for IRS use-cases directly to the EDC Provider components.
+After Umbrella setup and seeding, the IRS docker image is built based on the branch, the workflow is run from, and the IRS helm chart from the same branch is installed.
+This ensures, that features on branches can be tested as well.</p>
 </div>
+<div class="paragraph">
+<p>The workflows <a href="https://github.com/eclipse-tractusx/item-relationship-service/blob/main/.github/workflows/tavern-UMBRELLA.yml">tavern-UMBRELLA.yaml</a> and <a href="https://github.com/eclipse-tractusx/item-relationship-service/blob/main/.github/workflows/cucumber-integration-test-UMBRELLA.yaml">cucumber-integration-test-UMBRELLA.yaml</a> use the action to execute the tests.
+Test results are automatically added to the workflow summary and in case of the cucumber tests uploaded to the <a href="https://reports.cucumber.io/report-collections/b82bcadd-0d19-41c4-ae1a-c623e259c36f">IRS Cucumber Report</a></p>
 </div>
-</div>
-<div class="sect2">
-<h3 id="_ess_investigation_interaction_diagram">ESS Investigation interaction diagram</h3>
-<div class="imageblock">
-<div class="content">
-<img src="ess-api.svg" alt="ess api" width="779" height="471">
-</div>
-</div>
+<div class="paragraph">
+<p>Due to limitations in the IATP mock, the only way of using multiple BPNs in the test data is to spin up multiple EDC provider instances.
+However, the chart is used inside GitHub Workflows, so compute resources are limited.
+For this reason, the IRS test data was changed to include only data pointing to a single BPN.</p>
 </div>
 </div>
 </div>
