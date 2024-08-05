@@ -60,6 +60,7 @@ import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import org.awaitility.Awaitility;
 import org.eclipse.tractusx.irs.component.JobHandle;
 import org.eclipse.tractusx.irs.component.Jobs;
+import org.eclipse.tractusx.irs.component.ProcessingError;
 import org.eclipse.tractusx.irs.component.RegisterJob;
 import org.eclipse.tractusx.irs.component.Tombstone;
 import org.eclipse.tractusx.irs.component.enums.JobState;
@@ -212,7 +213,8 @@ class IrsWireMockIntegrationTest {
         successfulRegistryAndDataRequest(globalAssetIdLevel2, "Polyamid", TEST_BPN, "integrationtesting/batch-2.json",
                 "integrationtesting/singleLevelBomAsBuilt-2.json");
 
-        final RegisterJob request = WiremockSupport.jobRequest(globalAssetIdLevel1, TEST_BPN, 1, WiremockSupport.CALLBACK_URL);
+        final RegisterJob request = WiremockSupport.jobRequest(globalAssetIdLevel1, TEST_BPN, 1,
+                WiremockSupport.CALLBACK_URL);
 
         // Act
         final List<JobHandle> startedJobs = new ArrayList<>();
@@ -415,7 +417,7 @@ class IrsWireMockIntegrationTest {
     }
 
     @Test
-    void whenEmptyCatalogIsReturnedFromAllEndpoints() {
+    void whenEmptyCatalogIsReturnedFromAllEndpoints_tombstoneShouldContainAllRootCauses() {
         // Arrange
         final String globalAssetId = "urn:uuid:334cce52-1f52-4bc9-9dd1-410bbe497bbc";
         final List<String> edcUrls = List.of("https://test.edc1.io", "https://test.edc2.io");
@@ -434,7 +436,6 @@ class IrsWireMockIntegrationTest {
         final Jobs jobForJobId = irsService.getJobForJobId(jobHandle.getId(), false);
 
         // Assert
-
         assertThat(jobForJobId.getJob().getState()).isEqualTo(JobState.COMPLETED);
 
         assertThat(jobForJobId.getShells()).isEmpty();
@@ -449,6 +450,13 @@ class IrsWireMockIntegrationTest {
         assertThat(actualTombstone.getEndpointURL()).describedAs("Tombstone should contain all EDC URLs")
                                                     .isEqualTo(String.join("; ", edcUrls));
 
+        final ProcessingError processingError = actualTombstone.getProcessingError();
+        final List<String> rootCauses = processingError.getRootCauses();
+        assertThat(processingError.getErrorDetail()).isEqualTo("Unable to find any of the requested shells");
+        assertThat(rootCauses).hasSize(3);
+        assertThat(rootCauses.get(0)).isEqualTo("None successful");
+        assertThat(rootCauses.get(1)).contains(edcUrls.get(0));
+        assertThat(rootCauses.get(2)).contains(edcUrls.get(1));
     }
 
     @Test

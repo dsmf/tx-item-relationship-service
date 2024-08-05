@@ -23,6 +23,7 @@
  ********************************************************************************/
 package org.eclipse.tractusx.irs.component;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -58,7 +59,38 @@ public class Tombstone {
     private final Map<String, Object> policy;
 
     public static List<String> getRootErrorMessages(final Throwable... throwables) {
-        return Arrays.stream(throwables).map(Tombstone::getRootErrorMessages).toList();
+        return Arrays.stream(throwables)
+                     .flatMap((Throwable throwable) -> getRootCauses_(throwable).stream())
+                     .map(Throwable::getMessage)
+                     .toList();
+    }
+
+    private static List<Throwable> getRootCauses_(final Throwable throwable) {
+        final List<Throwable> result = new ArrayList<>();
+        Throwable rootCause = throwable;
+        while (rootCause.getCause() != null && rootCause.getCause() != rootCause) {
+            rootCause = rootCause.getCause();
+            //            if (rootCause.getSuppressed() != null && rootCause.getSuppressed().length > 0) {
+            //                for (int i = 0; i < rootCause.getSuppressed().length; i++) {
+            //                    result.add(ExceptionUtils.getRootCause(rootCause.getSuppressed()[i]));
+            //                }
+            //            }
+
+        }
+        result.add(rootCause);
+
+        rootCause = throwable;
+        while (rootCause.getCause() != null && rootCause.getCause() != rootCause) {
+            rootCause = rootCause.getCause();
+            if (rootCause.getSuppressed() != null && rootCause.getSuppressed().length > 0) {
+                for (int i = 0; i < rootCause.getSuppressed().length; i++) {
+                    result.add(ExceptionUtils.getRootCause(rootCause.getSuppressed()[i]));
+                }
+            }
+
+        }
+
+        return result;
     }
 
     /**
