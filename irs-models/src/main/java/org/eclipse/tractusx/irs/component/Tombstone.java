@@ -82,24 +82,23 @@ public class Tombstone {
      * @return the root causes
      */
     private static List<Throwable> getRootCauses(final Throwable throwable) {
-        final List<Throwable> result = new ArrayList<>();
+        final List<Throwable> rootCauses = new ArrayList<>();
+        collectRootCauses(throwable, rootCauses);
+        return rootCauses;
+    }
 
-        // root cause from exception hierarchy
-        result.add(ExceptionUtils.getRootCause(throwable));
-
-        // root causes of all suppressed exceptions in the hierarchy
-        Throwable currentThrowable = throwable;
-        for (final Throwable suppressed : currentThrowable.getSuppressed()) {
-            result.add(ExceptionUtils.getRootCause(suppressed));
-        }
-        while (currentThrowable.getCause() != null) {
-            currentThrowable = currentThrowable.getCause();
-            for (final Throwable suppressed : currentThrowable.getSuppressed()) {
-                result.add(ExceptionUtils.getRootCause(suppressed));
-            }
+    private static void collectRootCauses(final Throwable throwable, final List<Throwable> rootCauses) {
+        if (throwable == null) {
+            return;
         }
 
-        return result;
+        rootCauses.add(ExceptionUtils.getRootCause(throwable));
+
+        for (final Throwable suppressed : throwable.getSuppressed()) {
+            collectRootCauses(suppressed, rootCauses);
+        }
+
+        collectRootCauses(throwable.getCause(), rootCauses);
     }
 
 }
