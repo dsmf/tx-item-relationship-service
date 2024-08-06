@@ -60,69 +60,46 @@ public class Tombstone {
     private final ProcessingError processingError;
     private final Map<String, Object> policy;
 
+    /**
+     * Search for the root cause messages including root causes of suppressed exceptions.
+     * Removes duplicate messages.
+     *
+     * @param throwables one or more {@link Throwable}s
+     * @return the distinct list of root cause messages
+     */
     public static List<String> getRootErrorMessages(final Throwable... throwables) {
         return Arrays.stream(throwables)
-                     .flatMap((Throwable throwable) -> getRootCauses_(throwable).stream())
-                     .map(Throwable::getMessage)
+                     .flatMap((Throwable throwable) -> getRootCauses(throwable).stream())
+                     .map(t -> "%s: %s".formatted(t.getClass().getSimpleName(), t.getMessage()))
+                     .distinct()
                      .toList();
     }
 
-    private static List<Throwable> getRootCauses_(final Throwable throwable) {
+    /**
+     * Search for the root causes including root causes of suppressed exceptions.
+     *
+     * @param throwable the exception with a nested or suppressed exception
+     * @return the root causes
+     */
+    private static List<Throwable> getRootCauses(final Throwable throwable) {
         final List<Throwable> result = new ArrayList<>();
-        Throwable rootCause = throwable;
-        while (rootCause.getCause() != null && rootCause.getCause() != rootCause) {
-            rootCause = rootCause.getCause();
-            //            if (rootCause.getSuppressed() != null && rootCause.getSuppressed().length > 0) {
-            //                for (int i = 0; i < rootCause.getSuppressed().length; i++) {
-            //                    result.add(ExceptionUtils.getRootCause(rootCause.getSuppressed()[i]));
-            //                }
-            //            }
 
+        // root cause from exception hierarchy
+        result.add(ExceptionUtils.getRootCause(throwable));
+
+        // root causes of all suppressed exceptions in the hierarchy
+        Throwable currentThrowable = throwable;
+        for (final Throwable suppressed : currentThrowable.getSuppressed()) {
+            result.add(ExceptionUtils.getRootCause(suppressed));
         }
-        result.add(rootCause);
-
-        rootCause = throwable;
-        while (rootCause.getCause() != null && rootCause.getCause() != rootCause) {
-            rootCause = rootCause.getCause();
-            if (rootCause.getSuppressed() != null && rootCause.getSuppressed().length > 0) {
-                for (int i = 0; i < rootCause.getSuppressed().length; i++) {
-                    result.add(ExceptionUtils.getRootCause(rootCause.getSuppressed()[i]));
-                }
+        while (currentThrowable.getCause() != null) {
+            currentThrowable = currentThrowable.getCause();
+            for (final Throwable suppressed : currentThrowable.getSuppressed()) {
+                result.add(ExceptionUtils.getRootCause(suppressed));
             }
-
         }
 
         return result;
     }
 
-    /**
-     * Search for the root cause or suppressed exception as long as there is a cause or suppressed exception.
-     * Stop after a depth of 10 to prevent endless loop.
-     *
-     * @param throwable the exception with a nested or suppressed exception
-     * @return the root cause, eiter suppressed or nested
-     */
-    private static String getRootErrorMessages(final Throwable throwable) {
-        final Throwable cause = throwable.getCause();
-
-        if (cause != null) {
-            Throwable rootCause = cause;
-            int depth = 0;
-            final int maxDepth = 10;
-            while ((rootCause.getCause() != null || hasSuppressedExceptions(rootCause)) && depth < maxDepth) {
-                if (hasSuppressedExceptions(rootCause)) {
-                    rootCause = rootCause.getSuppressed()[0];
-                } else {
-                    rootCause = rootCause.getCause();
-                }
-                depth++;
-            }
-            return ExceptionUtils.getRootCauseMessage(rootCause);
-        }
-        return ExceptionUtils.getRootCauseMessage(throwable);
-    }
-
-    private static boolean hasSuppressedExceptions(final Throwable exception) {
-        return exception.getSuppressed().length > 0;
-    }
 }

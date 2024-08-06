@@ -370,9 +370,12 @@ class IrsWireMockIntegrationTest {
         assertThat(actualTombstone.getBusinessPartnerNumber()).isEqualTo(TEST_BPN);
         assertThat(actualTombstone.getEndpointURL()).isEqualTo(CONTROLPLANE_PUBLIC_URL);
 
-        final List<String> rootCauses = actualTombstone.getProcessingError().getRootCauses();
-        assertThat(rootCauses).hasSize(1);
-        assertThat(rootCauses.get(0)).contains(
+        final ProcessingError processingError = actualTombstone.getProcessingError();
+        final List<String> rootCauses = processingError.getRootCauses();
+        assertThat(processingError.getErrorDetail()).isEqualTo("Unable to find any of the requested shells");
+        assertThat(rootCauses).hasSize(2);
+        assertThat(rootCauses.get(0)).isEqualTo("CompletionExceptions: None successful");
+        assertThat(rootCauses.get(1)).isEqualTo(
                 "UsagePolicyPermissionException: Policies [default-policy] did not match with policy from %s.".formatted(
                         TEST_BPN));
     }
@@ -411,9 +414,12 @@ class IrsWireMockIntegrationTest {
         assertThat(actualTombstone.getBusinessPartnerNumber()).isEqualTo(TEST_BPN);
         assertThat(actualTombstone.getEndpointURL()).isEqualTo(CONTROLPLANE_PUBLIC_URL);
 
-        final List<String> rootCauses = actualTombstone.getProcessingError().getRootCauses();
-        assertThat(rootCauses).hasSize(1);
-        assertThat(rootCauses.get(0)).contains("502 Bad Gateway");
+        final ProcessingError processingError = actualTombstone.getProcessingError();
+        final List<String> rootCauses = processingError.getRootCauses();
+        assertThat(processingError.getErrorDetail()).isEqualTo("Unable to find any of the requested shells");
+        assertThat(rootCauses).hasSize(2);
+        assertThat(rootCauses.get(0)).isEqualTo("CompletionExceptions: None successful");
+        assertThat(rootCauses.get(1)).contains("502 Bad Gateway");
     }
 
     @Test
@@ -454,7 +460,7 @@ class IrsWireMockIntegrationTest {
         final List<String> rootCauses = processingError.getRootCauses();
         assertThat(processingError.getErrorDetail()).isEqualTo("Unable to find any of the requested shells");
         assertThat(rootCauses).hasSize(3);
-        assertThat(rootCauses.get(0)).isEqualTo("None successful");
+        assertThat(rootCauses.get(0)).isEqualTo("CompletionExceptions: None successful");
         assertThat(rootCauses.get(1)).contains(edcUrls.get(0));
         assertThat(rootCauses.get(2)).contains(edcUrls.get(1));
     }
