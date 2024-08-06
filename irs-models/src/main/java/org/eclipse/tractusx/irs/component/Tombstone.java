@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 import lombok.extern.jackson.Jacksonized;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.eclipse.tractusx.irs.component.enums.NodeType;
@@ -44,6 +45,7 @@ import org.eclipse.tractusx.irs.component.enums.NodeType;
 @Builder(toBuilder = true)
 @Jacksonized
 @Schema(description = "Tombstone with information about request failure")
+@ToString
 public class Tombstone {
 
     public static final int CATENA_X_ID_LENGTH = 45;
