@@ -23,9 +23,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.List;
 
 import io.github.resilience4j.retry.RetryRegistry;
 import org.eclipse.tractusx.irs.component.enums.ProcessStep;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 class TombstoneTest {
@@ -59,7 +61,8 @@ class TombstoneTest {
                                                      .withRetryCounterAndLastAttemptNow(retryCount)
                                                      .withErrorDetail(exception.getMessage())
                                                      .build();
-        final Tombstone tombstone = Tombstone.builder().endpointURL(endPointUrl)
+        final Tombstone tombstone = Tombstone.builder()
+                                             .endpointURL(endPointUrl)
                                              .catenaXId(catenaXId)
                                              .processingError(error)
                                              .build();
@@ -94,10 +97,10 @@ class TombstoneTest {
                                                      .withRootCauses(Tombstone.getRootErrorMessages(suppressed))
                                                      .build();
         final Tombstone tombstone = Tombstone.builder()
-                                        .endpointURL("testUrl")
-                                        .catenaXId("testId")
-                                        .processingError(error)
-                                        .build();
+                                             .endpointURL("testUrl")
+                                             .catenaXId("testId")
+                                             .processingError(error)
+                                             .build();
 
         // assert
         assertThat(tombstone.getProcessingError().getErrorDetail()).isEqualTo(exception.getMessage());
@@ -127,10 +130,10 @@ class TombstoneTest {
                                                      .withRootCauses(Tombstone.getRootErrorMessages(suppressed))
                                                      .build();
         final Tombstone tombstone = Tombstone.builder()
-                                        .endpointURL("testUrl")
-                                        .catenaXId("testId")
-                                        .processingError(error)
-                                        .build();
+                                             .endpointURL("testUrl")
+                                             .catenaXId("testId")
+                                             .processingError(error)
+                                             .build();
 
         // assert
         assertThat(tombstone.getProcessingError().getErrorDetail()).isEqualTo(exception.getMessage());
@@ -153,10 +156,10 @@ class TombstoneTest {
                                                      .withRootCauses(Tombstone.getRootErrorMessages(suppressed))
                                                      .build();
         final Tombstone tombstone = Tombstone.builder()
-                                        .endpointURL("testUrl")
-                                        .catenaXId("testId")
-                                        .processingError(error)
-                                        .build();
+                                             .endpointURL("testUrl")
+                                             .catenaXId("testId")
+                                             .processingError(error)
+                                             .build();
 
         // assert
         assertThat(tombstone.getProcessingError().getErrorDetail()).isEqualTo(exception.getMessage());
@@ -166,6 +169,101 @@ class TombstoneTest {
     private String zonedDateTimeExcerpt(ZonedDateTime dateTime) {
         return "%d-%s-%dT%d:%d:%d".formatted(dateTime.getYear(), dateTime.getMonth(), dateTime.getDayOfMonth(),
                 dateTime.getHour(), dateTime.getMinute(), dateTime.getSecond());
+    }
+
+    @Nested
+    class GetRootErrorMessagesTests {
+
+        @Test
+        public void testSingleThrowable() {
+            final Throwable t = new Throwable("Root cause message");
+            final List<String> messages = Tombstone.getRootErrorMessages(t);
+            assertThat(messages).containsExactly("Throwable: Root cause message");
+        }
+
+        @Test
+        public void testMultipleThrowables() {
+            final Throwable t1 = new Throwable("Root cause message 1");
+            final Throwable t2 = new Throwable("Root cause message 2");
+
+            final List<String> messages = Tombstone.getRootErrorMessages(t1, t2);
+
+            assertThat(messages).containsExactlyInAnyOrder("Throwable: Root cause message 1",
+                    "Throwable: Root cause message 2");
+        }
+
+        @Test
+        public void testNestedThrowable() {
+            final Throwable rootCause = new Throwable("Root cause message");
+            final Throwable exception = new Throwable("My exception", rootCause);
+
+            final List<String> messages = Tombstone.getRootErrorMessages(exception);
+
+            assertThat(messages).containsExactly("Throwable: Root cause message");
+        }
+
+        @Test
+        public void testSuppressedThrowable() {
+            final Throwable suppressed = new Throwable("Suppressed message");
+            final Throwable main = new Throwable("Main exception");
+            main.addSuppressed(suppressed);
+
+            final List<String> messages = Tombstone.getRootErrorMessages(main);
+
+            assertThat(messages).containsExactlyInAnyOrder("Throwable: Main exception",
+                    "Throwable: Suppressed message");
+        }
+
+        @Test
+        public void testDistinctMessages() {
+            final Throwable t1 = new Throwable("Same message");
+            final Throwable t2 = new Throwable("Same message");
+
+            final List<String> messages = Tombstone.getRootErrorMessages(t1, t2);
+
+            assertThat(messages).containsExactly("Throwable: Same message");
+        }
+
+        @Test
+        public void testComplexExceptionHierarchy() {
+            final Throwable rootCause = new Throwable("Root cause message");
+            final Throwable rootCauseFromSuppressed1 = new Throwable("Root cause message from suppressed 1");
+            final Throwable rootCauseFromSuppressed2 = new Throwable("Root cause message from suppressed 2");
+            final Throwable suppressed1 = new Throwable("Suppressed message 1", rootCauseFromSuppressed1);
+            final Throwable suppressed2 = new Throwable("Suppressed message 2", rootCauseFromSuppressed2);
+            final Throwable exception = new Throwable("My exception", rootCause);
+            exception.addSuppressed(suppressed1);
+            exception.addSuppressed(suppressed2);
+
+            final List<String> messages = Tombstone.getRootErrorMessages(exception);
+
+            assertThat(messages).containsExactlyInAnyOrder("Throwable: Root cause message",
+                    "Throwable: Root cause message from suppressed 1",
+                    "Throwable: Root cause message from suppressed 2");
+        }
+
+        @Test
+        public void testComplexExceptionHierarchy_duplicateRootCauseFromSuppressedExceptions() {
+            final Throwable rootCause = new Throwable("Root cause message");
+            final Throwable rootCauseFromSuppressed1 = new Throwable("Root cause message from suppressed");
+            final Throwable rootCauseFromSuppressed2 = new Throwable("Root cause message from suppressed");
+            final Throwable suppressed1 = new Throwable("Suppressed message", rootCauseFromSuppressed1);
+            final Throwable suppressed2 = new Throwable("Suppressed message 2", rootCauseFromSuppressed2);
+            final Throwable exception = new Throwable("My exception", rootCause);
+            exception.addSuppressed(suppressed1);
+            exception.addSuppressed(suppressed2);
+
+            final List<String> messages = Tombstone.getRootErrorMessages(exception);
+
+            assertThat(messages).containsExactlyInAnyOrder("Throwable: Root cause message",
+                    "Throwable: Root cause message from suppressed");
+        }
+
+        @Test
+        public void testEmptyInput() {
+            final List<String> messages = Tombstone.getRootErrorMessages();
+            assertThat(messages).isEmpty();
+        }
     }
 
 }
